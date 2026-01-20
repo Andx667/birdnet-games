@@ -344,6 +344,37 @@
             border-color: #1976d2;
         }
 
+        .fullscreen-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            background: #1976d2;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .fullscreen-fab:hover {
+            background: #1565c0;
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        .fullscreen-fab:active {
+            transform: scale(0.95);
+        }
+
         /* Responsive layout */
         @media (max-width: 1024px) {
             .container {
@@ -410,6 +441,8 @@
             <button onclick="game.restart()">Play Again</button>
         </div>
     </div>
+
+    <button class="fullscreen-fab" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
 
     <footer>
         <p>Connect four birds in a row! Inspired by <a href="https://birdnet.cornell.edu" target="_blank">BirdNET</a></p>
@@ -694,6 +727,36 @@
         // Initialize game
         const game = new ConnectFour();
         game.init();
+
+        // Fullscreen functionality
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function updateFullscreenButton() {
+            if (document.fullscreenElement) {
+                fullscreenBtn.textContent = '⛶';
+                fullscreenBtn.title = 'Exit Fullscreen';
+            } else {
+                fullscreenBtn.textContent = '⛶';
+                fullscreenBtn.title = 'Enter Fullscreen';
+            }
+        }
+
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            document.addEventListener('fullscreenchange', updateFullscreenButton);
+        }
 
         // Install prompt (PWA)
         let deferredPrompt;
