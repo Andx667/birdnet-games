@@ -32,16 +32,23 @@
         .container {
             max-width: min(1400px, 95vw);
             width: 100%;
+            display: flex;
+            gap: clamp(15px, 2vw, 25px);
+            align-items: flex-start;
         }
 
         header {
             background: white;
-            padding: clamp(10px, 1.5vw, 20px);
+            padding: clamp(15px, 2vw, 25px);
             border-radius: clamp(6px, 1vw, 12px);
             border: 1px solid #e0e0e0;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: clamp(10px, 1.5vw, 15px);
             text-align: center;
+            flex: 0 0 auto;
+            width: clamp(220px, 28vw, 320px);
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
         }
 
         h1 {
@@ -71,34 +78,34 @@
 
         .controls {
             display: flex;
-            justify-content: center;
-            gap: clamp(8px, 1.5vw, 15px);
-            flex-wrap: wrap;
-            margin-bottom: clamp(8px, 1.5vw, 12px);
+            flex-direction: column;
+            gap: clamp(8px, 1.5vw, 12px);
+            margin-bottom: clamp(12px, 2vw, 20px);
         }
 
         .stats {
             display: flex;
-            justify-content: center;
-            gap: clamp(15px, 3vw, 30px);
+            flex-direction: column;
+            gap: clamp(10px, 2vw, 15px);
             font-size: clamp(0.9rem, 1.8vw, 1.1rem);
             color: #333;
-            flex-wrap: wrap;
         }
 
         .stat-item {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            min-width: clamp(55px, 12vw, 85px);
+            padding: clamp(8px, 1.5vw, 12px);
+            background: #f8f9fa;
+            border-radius: 6px;
         }
 
         .stat-label {
-            font-size: clamp(0.6rem, 1.2vw, 0.85rem);
+            font-size: clamp(0.7rem, 1.3vw, 0.9rem);
             color: #666;
-            margin-bottom: clamp(2px, 0.4vw, 5px);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 500;
         }
 
         .stat-value {
@@ -164,11 +171,8 @@
             border: 1px solid #e0e0e0;
             border-radius: clamp(6px, 1vw, 12px);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: clamp(10px, 1.5vw, 15px);
-            max-width: 100%;
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
+            flex: 1;
+            min-width: 0;
         }
 
         .card {
@@ -394,13 +398,18 @@
 
         .player-scores {
             display: flex;
-            justify-content: center;
-            gap: clamp(25px, 5vw, 50px);
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: clamp(10px, 2vw, 15px);
         }
 
         .player-score {
             transition: transform 0.3s;
+            padding: clamp(8px, 1.5vw, 12px);
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .player-score.active {
@@ -442,6 +451,50 @@
             .card { min-width: 50px; min-height: 50px; }
         }
         
+        /* Revert to vertical layout on medium and smaller screens */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            header {
+                width: 100%;
+                position: static;
+            }
+            
+            .controls {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .stats {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .stat-item {
+                flex-direction: column;
+                min-width: clamp(60px, 15vw, 100px);
+            }
+            
+            .stat-label {
+                margin-bottom: clamp(3px, 0.5vw, 5px);
+            }
+            
+            .player-scores {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .player-score {
+                flex-direction: column;
+                min-width: 120px;
+            }
+        }
+        
         /* Landscape orientation on mobile */
         @media (max-width: 900px) and (orientation: landscape) {
             body { padding: 10px; }
@@ -453,14 +506,12 @@
         /* Large screens optimization */
         @media (min-width: 1920px) {
             .container { max-width: 1600px; }
-            .game-board { max-width: 1400px; margin: 0 auto; }
         }
         
         /* Extra large displays (65" and above) */
         @media (min-width: 2560px) {
             body { font-size: 20px; }
             .container { max-width: 2000px; }
-            .game-board { max-width: 1800px; }
             button, select { min-height: 60px; }
         }
     </style>
