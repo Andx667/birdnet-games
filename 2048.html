@@ -192,6 +192,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             min-width: 0;
             min-height: 0;
+            position: relative;
         }
 
         .tile-image {
@@ -210,6 +211,19 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             max-width: 100%;
+        }
+
+        .tile-level {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: clamp(0.6rem, 1.5vw, 0.8rem);
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            line-height: 1;
         }
 
         .tile-new {
@@ -814,6 +828,10 @@
                             tileDiv.style.gridColumn = col + 1;
                             tileDiv.style.background = bird.color;
 
+                            const levelBadge = document.createElement('div');
+                            levelBadge.className = 'tile-level';
+                            levelBadge.textContent = tile.level + 1;
+
                             const img = document.createElement('img');
                             img.className = 'tile-image';
                             img.src = bird.imageUrl;
@@ -826,6 +844,7 @@
                             name.className = 'tile-name';
                             name.textContent = bird.name.length > 15 ? bird.name.substring(0, 13) + '...' : bird.name;
 
+                            tileDiv.appendChild(levelBadge);
                             tileDiv.appendChild(img);
                             tileDiv.appendChild(name);
                             this.tileContainer.appendChild(tileDiv);
