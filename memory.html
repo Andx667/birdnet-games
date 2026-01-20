@@ -338,6 +338,19 @@
             to { transform: scale(1); }
         }
 
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
         footer {
             color: #666;
             text-align: center;
@@ -528,6 +541,7 @@
         </div>
 
         <header>
+            <a href="index.html" class="back-link">← Back to Games</a>
             <h1>
                 <img src="https://birdnet.cornell.edu/img/logo-birdnet-circle.png" alt="BirdNET Logo" class="logo">
                 BirdNET Memory Game

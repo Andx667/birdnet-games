@@ -53,18 +53,21 @@
 
         h1 {
             color: #1976d2;
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 3px;
+            font-size: clamp(1.1rem, 3vw, 2rem);
             font-weight: 600;
+            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: clamp(6px, 1vw, 10px);
+            flex-wrap: wrap;
         }
 
         .logo {
-            width: clamp(36px, 6vw, 48px);
-            height: clamp(36px, 6vw, 48px);
+            width: clamp(28px, 4vw, 48px);
+            height: clamp(28px, 4vw, 48px);
+            object-fit: contain;
         }
 
         .subtitle {
@@ -313,9 +316,27 @@
             color: #1976d2;
             text-decoration: none;
             font-weight: 500;
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
         }
 
         .back-link:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            color: #666;
+            text-align: center;
+            padding: clamp(15px, 2vw, 25px);
+            font-size: clamp(0.75rem, 1.8vw, 1.1rem);
+            line-height: 1.6;
+        }
+
+        footer a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+
+        footer a:hover {
             text-decoration: underline;
         }
 
@@ -428,8 +449,15 @@
         <button onclick="game.restart()">Try Again</button>
     </div>
 
+    <footer>
+        <p>Merge bird species to discover the rarest! Inspired by <a href="https://birdnet.cornell.edu" target="_blank">BirdNET</a></p>
+        <p style="margin-top: 5px; font-size: 0.85em;" id="dataSource">Loading bird observations...</p>
+        <p style="margin-top: 5px; font-size: 0.8em;">Data source: <a href="https://birdnet.cornell.edu/api2/requeststats" target="_blank">BirdNET API</a></p>
+    </footer>
+
     <script>
         let BIRDS = [];
+        let BIRD_DATA_SOURCE = 'Loading...';
         
         // Fetch bird data from BirdNET API
         async function fetchBirdData() {
@@ -489,9 +517,22 @@
                     };
                 });
                 
+                // Update data source info
+                const totalObservations = observations.length;
+                const uniqueSpecies = speciesData.length;
+                BIRD_DATA_SOURCE = `Live data from BirdNET (${totalObservations.toLocaleString()} observations, ${uniqueSpecies} species in last 24h)`;
+                const sourceElement = document.getElementById('dataSource');
+                if (sourceElement) {
+                    sourceElement.textContent = BIRD_DATA_SOURCE;
+                }
+                
                 return true;
             } catch (error) {
                 console.error('Failed to fetch bird data:', error);
+                const sourceElement = document.getElementById('dataSource');
+                if (sourceElement) {
+                    sourceElement.textContent = 'Failed to load bird data';
+                }
                 return false;
             }
         }
