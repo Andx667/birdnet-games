@@ -297,24 +297,28 @@
         }
 
         .instructions {
-            background: white;
-            padding: clamp(15px, 2vw, 25px);
-            border-radius: clamp(8px, 1.5vw, 12px);
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: #f8f9fa;
+            padding: clamp(12px, 2vw, 15px);
+            border-radius: 8px;
+            margin-top: clamp(12px, 2vw, 15px);
         }
 
         .instructions h3 {
             color: #1976d2;
-            margin-bottom: 10px;
-            font-size: clamp(1rem, 2vw, 1.2rem);
+            margin-bottom: 8px;
+            font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+            font-weight: 600;
         }
 
         .instructions p {
             color: #666;
-            line-height: 1.6;
-            margin-bottom: 8px;
-            font-size: clamp(0.85rem, 1.5vw, 1rem);
+            line-height: 1.5;
+            margin-bottom: 6px;
+            font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+        }
+
+        .instructions p:last-child {
+            margin-bottom: 0;
         }
 
         .loading {
@@ -421,6 +425,12 @@
                 </div>
                 <button id="newGameBtn">New Game</button>
             </div>
+
+            <div class="instructions">
+                <h3>How to Play</h3>
+                <p>Use arrow keys (or swipe on mobile) to move tiles. When two tiles with the same bird species touch, they merge into a rarer bird!</p>
+                <p>Progress from common to rare birds. Can you discover the rarest species?</p>
+            </div>
         </header>
 
         <div class="grid-wrapper">
@@ -447,12 +457,6 @@
                     
                     <div class="tile-container" id="tileContainer"></div>
                 </div>
-            </div>
-
-            <div class="instructions">
-                <h3>How to Play</h3>
-                <p>Use arrow keys (or swipe on mobile) to move tiles. When two tiles with the same bird species touch, they merge into a rarer bird!</p>
-                <p>Progress from common to rare birds. Can you discover the rarest species?</p>
             </div>
         </div>
     </div>
