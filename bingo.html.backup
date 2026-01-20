@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#1976d2">
-    <meta name="description" content="BirdNET Bingo - Two-player bird spotting game">
+    <meta name="description" content="BirdNET Bingo - Spot birds and mark your card">
     <title>BirdNET Bingo</title>
     
     <link rel="manifest" href="#" id="manifest-placeholder">
@@ -106,6 +106,43 @@
             color: #1976d2;
         }
 
+        .current-call.active {
+            animation: pulse-border 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% {
+                border-color: #1976d2;
+            }
+            50% {
+                border-color: #42a5f5;
+            }
+        }
+
+        .call-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1976d2;
+        }
+
         button {
             padding: 12px 24px;
             font-size: 1rem;
@@ -131,7 +168,21 @@
             transform: none;
         }
 
-        .game-area {
+        .grid-wrapper {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .grid-container {
+            background: white;
+            padding: clamp(15px, 2vw, 25px);
+            border-radius: clamp(8px, 1.5vw, 12px);
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }ame-area {
             display: flex;
             gap: clamp(20px, 3vw, 40px);
             align-items: center;
@@ -200,88 +251,10 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            user-select: none;
-        }
-
-        .current-call-center:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
         }
 
         .current-call-center.active {
-            animation: pulse-border 2s ease-in-out infinite;
-            cursor: default;
-        }
-
-        .current-call-center.active:hover {
-            transform: none;
-        }
-
-        @keyframes pulse-border {
-            0%, 100% {
-                border-color: #1976d2;
-            }
-            50% {
-                border-color: #42a5f5;
-            }
-        }
-
-        .call-label {
-            font-size: 0.9rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .call-bird-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 8px;
-            border: 3px solid #1976d2;
-        }
-
-        .call-bird-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1976d2;
-            text-align: center;
-        }
-
-        .new-cards-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .center-column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: min(200px, 100%);
-            max-width: 300px;
-        }
-
-        .new-cards-container button {
-            min-width: 160px;
-        }
-
-        .bingo-cell {
-            aspect-ratio: 1;
-            background: white;
-            border: 3px solid #1976d2;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: clamp(4px, 1vw, 8px);
+            animation: pulse-border 2s ease-in-out infiniteamp(4px, 1vw, 8px);
             position: relative;
             overflow: hidden;
         }
@@ -313,24 +286,39 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
+        .bingo-cell.called {
+            animation: call-pulse 0.6s ease-out;
+        }
+
+        @keyframes call-pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px rgba(25, 118, 210, 0.6);
+            }
+        }
+
         .cell-image {
-            width: 70%;
-            height: 70%;
+            width: 60%;
+            height: 60%;
             object-fit: cover;
             border-radius: 50%;
             margin-bottom: 4px;
         }
 
         .cell-name {
-            font-size: clamp(0.5rem, 1.3vw, 0.7rem);
+            font-size: clamp(0.6rem, 1.5vw, 0.8rem);
             font-weight: 600;
             color: #1976d2;
             text-align: center;
-            line-height: 1.1;
+            line-height: 1.2;
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
         }
 
@@ -384,12 +372,6 @@
                 transform: scale(1);
                 opacity: 1;
             }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
         }
 
         .message-content h2 {
@@ -460,27 +442,7 @@
         .install-prompt {
             background: #e3f2fd;
             border: 1px solid #1976d2;
-            color: #333;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            display: none;
-        }
-
-        .install-prompt.show {
-            display: block;
-        }
-
-        .install-prompt button {
-            margin-top: 10px;
-            background: #1976d2;
-            color: white;
-            border-color: #1976d2;
-        }
-
-        /* Responsive layout */
-        @media (max-width: 1200px) {
+            color: #333;200px) {
             .game-area {
                 flex-direction: column;
             }
@@ -508,26 +470,25 @@
             }
 
             .controls {
+                flex-direction: column
                 flex-direction: column;
             }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="install-prompt" id="installPrompt">
-            <p>📱 Install this app for the best experience!</p>
-            <button id="installButton">Install App</button>
-        </div>
-
-        <header>
-            <a href="index.html" class="back-link">← Back to Games</a>
-            <h1>
-                <img src="https://birdnet.cornell.edu/img/logo-birdnet-circle.png" alt="BirdNET Logo" class="logo">
-                BirdNET Bingo
-            </h1>
-            <div class="subtitle">Two-Player Bird Bingo - First to complete a line wins!</div>
             
+            header {
+                width: 100%;
+                position: static;
+            }
+            
+            .grid-wrapper {
+                width: 100%;
+            }
+        }Two-Player Bird Bingo - First to complete a line wins!</div>
+            
+            <div class="controls">
+                <button id="startBtn">Start Game</button>
+                <button id="newCardBtn">New Cards</button>
+            </div>
+
             <div class="game-stats">
                 <div class="stat-box">
                     <div class="stat-label">Birds Called</div>
@@ -557,17 +518,10 @@
                 </div>
             </div>
 
-            <div class="center-column">
-                <div class="current-call-center" id="currentCall">
-                    <div class="call-label">Current Bird</div>
-                    <div class="call-bird-name">Click here to start</div>
-
-                </div>
-                <div class="new-cards-container">
-                    <button id="newCardBtn">New Cards</button>
-                </div>
+            <div class="current-call-cents()">New RounrentCall">
+                <div class="call-label">Current Bird</div>
+                <div class="call-bird-name">Press Start to begin</div>
             </div>
-
 
             <div class="player-section">
                 <div class="player-header player2">
@@ -576,7 +530,34 @@
                 </div>
                 <div class="grid-container">
                     <div id="bingoBoard2" class="bingo-board"></div>
+                
+            
+            <div class="current-call" id="currentCall">
+                <div class="call-label">Current Bird</div>
+                <div class="call-bird-name">Press Start to begin</div>
+            </div>
+
+            <div class="game-info">
+                <div class="info-row">
+                    <span class="info-label">Birds Called</span>
+                    <span class="info-value" id="calledCount">0</span>
                 </div>
+                <div class="info-row">
+                    <span class="info-label">Marked</span>
+                    <span class="info-value" id="markedCount">0 / 24</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="startBtn">Start Game</button>
+                <button id="newCardBtn">New Card</button>
+            </div>
+        </header>
+
+        <div class="grid-wrapper">
+            <div class="grid-container" id="gridContainer">
+                <div id="loading" class="loading">Loading bird data from BirdNET...</div>
+                <div id="bingoBoard" class="bingo-board" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -585,7 +566,7 @@
         <div class="message-content">
             <h2 id="messageTitle">🎉 BINGO! 🎉</h2>
             <p id="messageText"></p>
-            <button onclick="game.newCards()">New Round</button>
+            <button onclick="game.newCard()">New Card</button>
         </div>
     </div>
 
@@ -624,62 +605,14 @@
         async function fetchBirdData() {
             try {
                 const response = await fetch(BIRDNET.apiUrl);
-                const data = await response.json();
-                
-                const observations = data.observations || [];
-                const speciesMap = {};
-                
-                observations.forEach(obs => {
-                    const species = obs.species;
-                    if (species) {
-                        const [commonName, scientificName] = species.split(';');
-                        if (!speciesMap[commonName]) {
-                            speciesMap[commonName] = {
-                                name: commonName,
-                                scientificName: scientificName,
-                                count: 0
-                            };
-                        }
-                        speciesMap[commonName].count++;
-                    }
-                });
-                
-                const speciesData = Object.values(speciesMap)
-                    .sort((a, b) => b.count - a.count);
-                
-                if (speciesData.length >= 24) {
-                    BIRDS = speciesData.map(species => ({
-                        name: species.name,
-                        scientificName: species.scientificName,
-                        imageUrl: `https://birdnet.cornell.edu/api2/bird/${encodeURIComponent(species.scientificName)}.webp`,
-                        count: species.count
-                    }));
-                    
-                    const totalObservations = observations.length;
-                    const uniqueSpecies = speciesData.length;
-                    BIRD_DATA_SOURCE = formatBirdnetLiveData({ totalObservations, uniqueSpecies, hours: BIRDNET_DATA_WINDOW_HOURS });
-                    setFooterDataSourceText(BIRD_DATA_SOURCE);
-                }
-                
-                return true;
-            } catch (error) {
-                console.error('Failed to fetch bird data:', error);
-                setFooterDataSourceText('Failed to load bird data');
-                return false;
-            }
-        }
-
-        class BingoGame {
-            constructor() {
-                this.gridSize = 5;
-                this.board1 = [];
+                const data1 = [];
                 this.board2 = [];
                 this.markedCells1 = new Set();
                 this.markedCells2 = new Set();
                 this.calledBirds = [];
                 this.gameActive = false;
                 this.callInterval = null;
-                this.callDelay = 8000;
+                this.callDelay = 4000; // 4 seconds between calls
                 this.player1Wins = 0;
                 this.player2Wins = 0;
                 
@@ -696,28 +629,22 @@
                 this.gameMessage = document.getElementById('gameMessage');
                 this.messageTitle = document.getElementById('messageTitle');
                 this.messageText = document.getElementById('messageText');
+                this.startBtn = document.getElementById('startBtn');
                 this.newCardBtn = document.getElementById('newCardBtn');
                 
-                this.currentCall.addEventListener('click', () => this.startGame());
+                this.startBtn.addEventListener('click', () => this.startGame());
                 this.newCardBtn.addEventListener('click', () => this.newCards());
             }
 
             async init() {
                 const success = await fetchBirdData();
                 if (success && BIRDS.length >= 24) {
-                    this.loading.style.display = 'none';
-                    this.gameArea.style.display = 'flex';
-                    this.generateCards();
-                } else {
-                    this.loading.textContent = 'Failed to load bird data. Please refresh.';
-                }
-            }
-
-            generateCards() {
+                    thiss() {
+                // Generate two different cards
                 this.board1 = this.generateSingleCard();
                 this.board2 = this.generateSingleCard();
                 
-                this.markedCells1 = new Set([12]);
+                this.markedCells1 = new Set([12]); // Free space pre-marked
                 this.markedCells2 = new Set([12]);
                 
                 this.renderBoard(this.bingoBoard1, this.board1, 1);
@@ -726,14 +653,18 @@
             }
 
             generateSingleCard() {
+                // Select mix of common and rare birds for balanced gameplay
                 const commonBirds = BIRDS.slice(0, Math.min(50, Math.floor(BIRDS.length * 0.3)));
                 const rareBirds = BIRDS.slice(Math.min(50, Math.floor(BIRDS.length * 0.3)));
                 
+                // Randomly select 18 common and 6 rare birds
                 const selectedCommon = commonBirds.sort(() => Math.random() - 0.5).slice(0, 18);
                 const selectedRare = rareBirds.sort(() => Math.random() - 0.5).slice(0, 6);
                 
+                // Combine and shuffle
                 const board = [...selectedCommon, ...selectedRare].sort(() => Math.random() - 0.5);
                 
+                // Insert free space at position 12 (center of 5x5 grid)
                 board.splice(12, 0, { name: 'FREE', isFree: true });
                 
                 return board;
@@ -774,31 +705,22 @@
 
             toggleMark(index, playerNum) {
                 const board = playerNum === 1 ? this.board1 : this.board2;
-                const markedCells = playerNum === 1 ? this.markedCells1 : this.markedCells2;
-                const boardElement = playerNum === 1 ? this.bingoBoard1 : this.bingoBoard2;
+                const markedCells = playerNum === 1either board
+                const allBoardBirds = [...this.board1, ...this.board2]
+                    .filter(bird => !bird.isFree)
+                    .filter(bird => !this.calledBirds.some(cb => cb.name === bird.name));
                 
-                if (board[index].isFree) return;
+                // Remove duplicates
+                const uniqueBirds = Array.from(new Map(allBoardBirds.map(b => [b.name, b])).values());
                 
-                const cell = boardElement.children[index];
-                const birdOnCell = board[index];
+                if (uniqueBirds.length === 0) {
+                    this.stopGame();
+                    return;
+                }
                 
-                if (markedCells.has(index)) {
-                    // Allow unmarking
-                    markedCells.delete(index);
-                    cell.classList.remove('marked');
-                    const overlay = cell.querySelector('.mark-overlay');
-                    if (overlay) overlay.remove();
+                // Pick random bird from uncalled board birds
+                const bird = uniqueBirds[Math.floor(Math.random() * unique
                 } else {
-                    // Only allow marking if this bird has been called
-                    const birdHasBeenCalled = this.calledBirds.some(b => b.name === birdOnCell.name);
-                    
-                    if (!birdHasBeenCalled) {
-                        // Visual feedback that bird hasn't been called
-                        cell.style.animation = 'shake 0.3s';
-                        setTimeout(() => cell.style.animation = '', 300);
-                        return;
-                    }
-                    
                     markedCells.add(index);
                     cell.classList.add('marked');
                     const overlay = document.createElement('div');
@@ -813,7 +735,63 @@
 
             updateMarkedCounts() {
                 this.player1Marked.textContent = this.markedCells1.size;
-                this.player2Marked.textContent = this.markedCells2.size;
+                this.player2Marked.textContent = this.markedCells2.size
+                
+                this.board.forEach((bird, index) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'bingo-cell';
+                    cell.dataset.index = index;
+                    
+                    if (bird.isFree) {
+                        cell.classList.add('free', 'marked');
+                        cell.innerHTML = `<div class="cell-name">FREE<br>SPACE</div>`;
+                    } else {
+                        const img = document.createElement('img');
+                        img.className = 'cell-image';
+                        img.src = bird.imageUrl;
+                        img.alt = bird.name;
+                        img.onerror = () => img.style.display = 'none';
+                        
+                        const name = document.createElement('div');
+                        name.className = 'cell-name';
+                        name.textContent = bird.name;
+                        
+                        cell.appendChild(img);
+                        cell.appendChild(name);
+                        
+                        cell.addEventListener('click', () => this.toggleMark(index));
+                    }
+                    
+                    this.bingoBoard.appendChild(cell);
+                });
+            }
+
+            toggleMark(index) {
+                if (this.board[index].isFree) return;
+                
+                const cell = this.bingoBoard.children[index];
+                
+                if (this.markedCells.has(index)) {
+                    this.markedCells.delete(index);
+                    cell.classList.remove('marked');
+                    const overlay = cell.querySelector('.mark-overlay');
+                    if (overlay) overlay.remove();
+                } else {
+                    this.markedCells.add(index);
+                    cell.classList.add('marked');
+                    const overlay = document.createElement('div');
+                    overlay.className = 'mark-overlay';
+                    overlay.textContent = '✓';
+                    cell.appendChild(overlay);
+                }
+                
+                this.updateMarkedCount();
+                this.checkForBingo();
+            }
+
+            updateMarkedCount() {
+                const marked = this.markedCells.size;
+                this.markedCount.textContent = `${marked} / 24`;
             }
 
             startGame() {
@@ -821,6 +799,9 @@
                 
                 this.gameActive = true;
                 this.calledBirds = [];
+                this.currentBirdIndex = -1;
+                this.startBtn.disabled = true;
+                this.startBtn.textContent = 'Game Running...';
                 this.currentCall.classList.add('active');
                 
                 this.callNextBird();
@@ -828,33 +809,23 @@
             }
 
             callNextBird() {
-                // Only call birds that exist on at least one player's card
-                const allBoardBirds = [...this.board1, ...this.board2]
-                    .filter(bird => !bird.isFree)
-                    .filter(bird => !this.calledBirds.some(cb => cb.name === bird.name));
+                // Find uncalled birds that are on the board
+                const uncalledBoardBirds = this.board
+                    .map((bird, index) => ({ bird, index }))
+                    .filter(({ bird }) => !bird.isFree && !this.calledBirds.some(cb => cb.name === bird.name));
                 
-                // Remove duplicates by bird name
-                const uniqueBirds = Array.from(new Map(allBoardBirds.map(b => [b.name, b])).values());
-                
-                if (uniqueBirds.length === 0) {
+                if (uncalledBoardBirds.length === 0) {
                     this.stopGame();
                     return;
                 }
                 
-                const bird = uniqueBirds[Math.floor(Math.random() * uniqueBirds.length)];
-                
-                // Verify the bird exists on at least one board before calling
-                const existsOnBoard1 = this.board1.some(b => !b.isFree && b.name === bird.name);
-                const existsOnBoard2 = this.board2.some(b => !b.isFree && b.name === bird.name);
-                
-                if (!existsOnBoard1 && !existsOnBoard2) {
-                    console.warn('Bird not found on any board:', bird.name);
-                    return;
-                }
+                // Pick random bird from uncalled board birds
+                const { bird, index } = uncalledBoardBirds[Math.floor(Math.random() * uncalledBoardBirds.length)];
                 
                 this.calledBirds.push(bird);
                 this.calledCount.textContent = this.calledBirds.length;
                 
+                // Update current call display
                 this.currentCall.innerHTML = `
                     <div class="call-label">Current Bird</div>
                     <img src="${bird.imageUrl}" alt="${bird.name}" class="call-bird-image" onerror="this.style.display='none'">
@@ -868,82 +839,79 @@
                     clearInterval(this.callInterval);
                     this.callInterval = null;
                 }
+                this.startBtn.disabled = false;
+                this.startBtn.textContent = 'Start Game';
                 this.currentCall.classList.remove('active');
             }
 
-            checkForBingo(playerNum) {
-                const markedCells = playerNum === 1 ? this.markedCells1 : this.markedCells2;
-                
+            checkForBingo() {
                 const patterns = [
+                    // Rows
                     [0, 1, 2, 3, 4],
                     [5, 6, 7, 8, 9],
                     [10, 11, 12, 13, 14],
                     [15, 16, 17, 18, 19],
                     [20, 21, 22, 23, 24],
+                    // Columns
                     [0, 5, 10, 15, 20],
                     [1, 6, 11, 16, 21],
                     [2, 7, 12, 17, 22],
                     [3, 8, 13, 18, 23],
                     [4, 9, 14, 19, 24],
+                    // Diagonals
                     [0, 6, 12, 18, 24],
                     [4, 8, 12, 16, 20]
                 ];
                 
                 for (const pattern of patterns) {
-                    if (pattern.every(index => markedCells.has(index))) {
-                        this.showBingo(pattern, playerNum);
+                    if (pattern.every(index => this.markedCells.has(index))) {
+                        this.showBingo(pattern);
                         return;
                     }
                 }
             }
 
-            showBingo(winningPattern, playerNum) {
+            showBingo(winningPattern) {
                 this.stopGame();
                 
-                if (playerNum === 1) {
-                    this.player1Wins++;
-                    this.player1WinsDisplay.textContent = this.player1Wins;
-                } else {
-                    this.player2Wins++;
-                    this.player2WinsDisplay.textContent = this.player2Wins;
-                }
-                
-                const boardElement = playerNum === 1 ? this.bingoBoard1 : this.bingoBoard2;
+                // Highlight winning pattern
                 winningPattern.forEach(index => {
-                    const cell = boardElement.children[index];
+                    const cell = this.bingoBoard.children[index];
                     cell.style.animation = 'pulse 0.6s ease-in-out infinite';
                 });
                 
-                this.messageTitle.textContent = `🎉 Player ${playerNum} BINGO! 🎉`;
+                this.messageTitle.textContent = '🎉 BINGO! 🎉';
                 this.messageText.innerHTML = `
-                    Player ${playerNum} got a winning line!<br>
+                    You got a winning line!<br>
                     <strong>${this.calledBirds.length}</strong> birds called<br>
-                    Score: P1: ${this.player1Wins} - P2: ${this.player2Wins}
+                    <strong>${this.markedCells.size}</strong> squares marked
                 `;
                 this.gameMessage.classList.add('show');
             }
 
-            newCards() {
+            newCard() {
                 this.stopGame();
                 this.gameMessage.classList.remove('show');
                 this.calledBirds = [];
                 this.calledCount.textContent = '0';
                 this.currentCall.innerHTML = `
                     <div class="call-label">Current Bird</div>
-                    <div class="call-bird-name">Click here to start</div>
+                    <div class="call-bird-name">Press Start to begin</div>
                 `;
-                this.currentCall.addEventListener('click', () => this.startGame());
-                this.generateCards();
+                this.generateCard();
             }
         }
 
+        // Initialize game
         const game = new BingoGame();
         game.init();
 
+        // Install prompt (PWA)
         let deferredPrompt;
         const installPrompt = document.getElementById('installPrompt');
         const installButton = document.getElementById('installButton');
 
+        // PWA functionality (single-file)
         function setDynamicManifest(manifestObject) {
             const manifestBlob = new Blob([JSON.stringify(manifestObject)], { type: 'application/json' });
             const manifestURL = URL.createObjectURL(manifestBlob);
@@ -1040,7 +1008,7 @@
         setDynamicManifest({
             name: 'BirdNET Bingo',
             short_name: 'Bird Bingo',
-            description: 'Two-player bird bingo - BirdNET themed game',
+            description: 'Spot birds and mark your bingo card - BirdNET themed game',
             start_url: './bingo.html',
             display: 'standalone',
             background_color: '#ffffff',
