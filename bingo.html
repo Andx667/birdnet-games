@@ -193,8 +193,7 @@
             border: 3px solid #1976d2;
             padding: clamp(15px, 2vw, 25px);
             border-radius: 12px;
-            min-width: min(200px, 100%);
-            max-width: 300px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -250,6 +249,9 @@
             font-weight: 600;
             color: #1976d2;
             text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            width: 100%;
         }
 
         .new-cards-container {
@@ -262,8 +264,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: min(200px, 100%);
-            max-width: 300px;
+            width: 300px;
+            flex-shrink: 0;
         }
 
         .new-cards-container button {
@@ -322,15 +324,16 @@
         }
 
         .cell-name {
-            font-size: clamp(0.5rem, 1.3vw, 0.7rem);
+            font-size: clamp(0.45rem, 1.1vw, 0.65rem);
             font-weight: 600;
             color: #1976d2;
             text-align: center;
-            line-height: 1.1;
+            line-height: 1.05;
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
         }
 
@@ -750,7 +753,13 @@
                     
                     if (bird.isFree) {
                         cell.classList.add('free', 'marked');
-                        cell.innerHTML = `<div class="cell-name">FREE<br>SPACE</div>`;
+                        const logo = document.createElement('img');
+                        logo.className = 'cell-image';
+                        logo.src = 'https://birdnet.cornell.edu/img/logo-birdnet-circle.png';
+                        logo.alt = 'BirdNET Logo';
+                        logo.style.width = '80%';
+                        logo.style.height = '80%';
+                        cell.appendChild(logo);
                     } else {
                         const img = document.createElement('img');
                         img.className = 'cell-image';
