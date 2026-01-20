@@ -159,6 +159,9 @@
             max-width: min(600px, 100%);
             margin: 0 auto;
             width: 100%;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .grid-cell {
@@ -675,11 +678,17 @@
 
                 // Touch controls
                 this.tileContainer.parentElement.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
                     this.touchStartX = e.touches[0].clientX;
                     this.touchStartY = e.touches[0].clientY;
-                }, { passive: true });
+                }, { passive: false });
+
+                this.tileContainer.parentElement.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                }, { passive: false });
 
                 this.tileContainer.parentElement.addEventListener('touchend', (e) => {
+                    e.preventDefault();
                     if (!this.gameStarted) return;
                     
                     const touchEndX = e.changedTouches[0].clientX;
@@ -693,7 +702,7 @@
                     } else if (Math.abs(dy) > 30) {
                         this.move(dy > 0 ? 'down' : 'up');
                     }
-                }, { passive: true });
+                }, { passive: false });
 
                 document.getElementById('newGameBtn').addEventListener('click', () => this.restart());
             }
