@@ -673,10 +673,12 @@
                         if (newLevel < BIRDS.length) {
                             result.push({ level: newLevel, isMerged: true });
                             this.score += Math.pow(2, newLevel + 1);
+                            i += 2;
                         } else {
-                            result.push(tiles[i]);
+                            // Max level reached, can't merge - keep both tiles
+                            result.push({ ...tiles[i], isNew: false, isMerged: false });
+                            i++;
                         }
-                        i += 2;
                     } else {
                         result.push({ ...tiles[i], isNew: false, isMerged: false });
                         i++;
