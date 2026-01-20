@@ -239,27 +239,31 @@
             border: 2px solid #1976d2;
             transform: rotateY(180deg);
             flex-direction: column;
-            padding: 10px;
+            padding: clamp(6px, 1vw, 10px);
         }
 
         .bird-image {
             max-width: 100%;
-            height: 70%;
+            height: 65%;
             width: auto;
             object-fit: contain;
             border-radius: 6px;
-            margin-bottom: 8px;
+            margin-bottom: clamp(4px, 0.8vw, 8px);
         }
 
         .bird-name {
-            font-size: clamp(0.5rem, 1.5vw, 1rem);
+            font-size: clamp(0.45rem, 1.2vw, 0.75rem);
             color: #555;
             text-align: center;
-            line-height: 1.2;
+            line-height: 1.1;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
             word-wrap: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            max-height: 2.2em;
         }
 
         .card.flipped .card-front {
@@ -849,7 +853,17 @@
                 
                 const birdData = card.bird;
                 const birdName = birdData.name || '';
-                const displayName = birdName.length > 20 ? birdName.substring(0, 20) + '...' : birdName;
+                // Smarter truncation: try to break at word boundary
+                let displayName = birdName;
+                if (birdName.length > 25) {
+                    const words = birdName.substring(0, 25).split(' ');
+                    if (words.length > 1) {
+                        words.pop(); // Remove last partial word
+                        displayName = words.join(' ') + '...';
+                    } else {
+                        displayName = birdName.substring(0, 22) + '...';
+                    }
+                }
                 
                 let backContent;
                 if (birdData.useImage && birdData.imageUrl) {
