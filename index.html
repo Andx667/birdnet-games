@@ -24,7 +24,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: clamp(20px, 4vw, 60px);
+            justify-content: center;
+            padding: clamp(15px, 2vw, 25px);
             color: #333;
             overflow-x: hidden;
         }
@@ -37,59 +38,59 @@
 
         header {
             background: white;
-            padding: clamp(30px, 5vw, 60px);
-            border-radius: clamp(12px, 2vw, 20px);
+            padding: clamp(20px, 3vw, 35px);
+            border-radius: clamp(10px, 1.5vw, 16px);
             border: 1px solid #e0e0e0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: clamp(30px, 4vw, 50px);
+            margin-bottom: clamp(20px, 3vw, 30px);
         }
 
         h1 {
             color: #1976d2;
-            margin-bottom: 15px;
-            font-size: clamp(2rem, 6vw, 4rem);
+            margin-bottom: 10px;
+            font-size: clamp(1.8rem, 5vw, 3rem);
             font-weight: 600;
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: clamp(15px, 2vw, 25px);
+            gap: clamp(12px, 2vw, 20px);
             flex-wrap: wrap;
         }
 
         .logo {
-            width: clamp(60px, 8vw, 100px);
-            height: clamp(60px, 8vw, 100px);
+            width: clamp(50px, 6vw, 80px);
+            height: clamp(50px, 6vw, 80px);
             object-fit: contain;
         }
 
         .tagline {
             color: #666;
-            font-size: clamp(1rem, 2.5vw, 1.5rem);
-            margin-bottom: 20px;
-            line-height: 1.5;
+            font-size: clamp(0.95rem, 2vw, 1.2rem);
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
 
         .description {
             color: #888;
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
-            line-height: 1.6;
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
+            line-height: 1.5;
             max-width: 600px;
             margin: 0 auto;
         }
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-            gap: clamp(20px, 3vw, 30px);
-            margin-bottom: clamp(30px, 4vw, 50px);
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+            gap: clamp(15px, 2.5vw, 25px);
+            margin-bottom: clamp(20px, 3vw, 30px);
         }
 
         .game-card {
             background: white;
             border: 1px solid #e0e0e0;
-            border-radius: clamp(12px, 2vw, 16px);
-            padding: clamp(25px, 4vw, 40px);
+            border-radius: clamp(10px, 1.5vw, 14px);
+            padding: clamp(20px, 3vw, 30px);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: all 0.3s;
             cursor: pointer;
@@ -97,7 +98,7 @@
             color: inherit;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .game-card:hover {
@@ -107,21 +108,21 @@
         }
 
         .game-icon {
-            font-size: clamp(3rem, 8vw, 5rem);
-            margin-bottom: 10px;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 5px;
         }
 
         .game-title {
-            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
             font-weight: 600;
             color: #1976d2;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .game-description {
             color: #666;
-            font-size: clamp(0.9rem, 2vw, 1.05rem);
-            line-height: 1.5;
+            font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+            line-height: 1.4;
             flex-grow: 1;
         }
 
@@ -148,9 +149,9 @@
         footer {
             color: #666;
             text-align: center;
-            padding: clamp(20px, 3vw, 30px);
-            font-size: clamp(0.85rem, 1.8vw, 1rem);
-            line-height: 1.6;
+            padding: clamp(15px, 2vw, 20px);
+            font-size: clamp(0.8rem, 1.6vw, 0.9rem);
+            line-height: 1.5;
         }
 
         footer a {
@@ -205,13 +206,10 @@
 
         <footer>
             <p>
-                Powered by <a href="https://birdnet.cornell.edu" target="_blank">BirdNET</a> - 
-                A research platform and toolkit for avian bioacoustics developed by the 
+                Powered by <a href="https://birdnet.cornell.edu" target="_blank">BirdNET</a> from the 
                 <a href="https://www.birds.cornell.edu/home" target="_blank">Cornell Lab of Ornithology</a> 
                 and <a href="https://www.tu-chemnitz.de" target="_blank">Chemnitz University of Technology</a>.
-            </p>
-            <p style="margin-top: 10px; font-size: 0.9em; color: #888;">
-                Data updates every 24 hours with real bird observations from around the world.
+                Data updates every 24 hours.
             </p>
         </footer>
     </div>
