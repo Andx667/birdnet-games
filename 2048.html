@@ -7,6 +7,8 @@
     <meta name="description" content="BirdNET 2048 - Merge bird species to discover the rarest birds">
     <title>BirdNET 2048</title>
     
+    <link rel="manifest" href="#" id="manifest-placeholder">
+    
     <style>
         * {
             margin: 0;
@@ -28,18 +30,25 @@
         }
 
         .container {
-            max-width: min(600px, 95vw);
+            max-width: min(1400px, 95vw);
             width: 100%;
+            display: flex;
+            gap: clamp(15px, 2vw, 25px);
+            align-items: flex-start;
         }
 
         header {
             background: white;
-            padding: clamp(15px, 3vw, 25px);
+            padding: clamp(15px, 2vw, 25px);
             border-radius: clamp(8px, 1.5vw, 12px);
             border: 1px solid #e0e0e0;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: clamp(15px, 2vw, 20px);
             text-align: center;
+            flex: 0 0 auto;
+            width: clamp(220px, 28vw, 320px);
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
         }
 
         h1 {
@@ -66,22 +75,24 @@
 
         .controls {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
             gap: 15px;
-            flex-wrap: wrap;
         }
 
         .score-container {
             display: flex;
-            gap: 15px;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .score-box {
             background: #f8f9fa;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 8px;
-            text-align: center;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .score-label {
@@ -89,7 +100,7 @@
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 5px;
+            font-weight: 500;
         }
 
         .score-value {
@@ -122,8 +133,11 @@
             border-radius: clamp(8px, 1.5vw, 12px);
             border: 1px solid #e0e0e0;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
             position: relative;
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .grid-container {
@@ -135,6 +149,8 @@
             gap: clamp(8px, 1.5vw, 15px);
             position: relative;
             aspect-ratio: 1;
+            max-width: min(600px, 100%);
+            margin: 0 auto;
         }
 
         .grid-cell {
@@ -305,14 +321,42 @@
             text-decoration: underline;
         }
 
+        /* Responsive layout - revert to vertical on smaller screens */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            header {
+                width: 100%;
+                position: static;
+            }
+            
+            .controls {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .score-container {
+                flex-direction: row;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .score-box {
+                flex-direction: column;
+                text-align: center;
+                flex: 1;
+            }
+        }
+
         @media (max-width: 480px) {
             .controls {
                 justify-content: center;
             }
             .score-container {
-                order: -1;
-                width: 100%;
-                justify-content: center;
+                flex-direction: column;
             }
         }
     </style>
@@ -724,6 +768,67 @@
         // Initialize game
         const game = new Game2048();
         game.init();
+
+        // PWA functionality
+        const manifest = {
+            name: "BirdNET 2048",
+            short_name: "BirdNET 2048",
+            description: "Merge bird species to discover the rarest birds",
+            start_url: "./2048.html",
+            display: "standalone",
+            background_color: "#ffffff",
+            theme_color: "#1976d2",
+            orientation: "portrait",
+            icons: [
+                {
+                    src: "https://birdnet.cornell.edu/img/logo-birdnet-circle.png",
+                    sizes: "512x512",
+                    type: "image/png",
+                    purpose: "any maskable"
+                }
+            ]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'birdnet-2048-v1';
+                
+                self.addEventListener('install', (event) => {
+                    self.skipWaiting();
+                });
+                
+                self.addEventListener('activate', (event) => {
+                    event.waitUntil(clients.claim());
+                });
+                
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(
+                        caches.match(event.request).then((response) => {
+                            return response || fetch(event.request).then((response) => {
+                                return caches.open(CACHE_NAME).then((cache) => {
+                                    cache.put(event.request, response.clone());
+                                    return response;
+                                });
+                            });
+                        })
+                    );
+                });
+            `;
+            
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(swBlob);
+            
+            navigator.serviceWorker.register(swURL).then(() => {
+                console.log('Service Worker registered for 2048');
+            }).catch((error) => {
+                console.log('Service Worker registration failed:', error);
+            });
+        }
     </script>
 </body>
 </html>

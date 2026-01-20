@@ -7,6 +7,8 @@
     <meta name="description" content="BirdNET Games - Collection of AI-powered bird-themed games">
     <title>BirdNET Games</title>
     
+    <link rel="manifest" href="#" id="manifest-placeholder">
+    
     <style>
         * {
             margin: 0;
@@ -213,5 +215,68 @@
             </p>
         </footer>
     </div>
+
+    <script>
+        // PWA functionality
+        const manifest = {
+            name: "BirdNET Games",
+            short_name: "BirdNET Games",
+            description: "Collection of AI-powered bird-themed games",
+            start_url: "./index.html",
+            display: "standalone",
+            background_color: "#ffffff",
+            theme_color: "#1976d2",
+            orientation: "portrait",
+            icons: [
+                {
+                    src: "https://birdnet.cornell.edu/img/logo-birdnet-circle.png",
+                    sizes: "512x512",
+                    type: "image/png",
+                    purpose: "any maskable"
+                }
+            ]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'birdnet-games-v1';
+                
+                self.addEventListener('install', (event) => {
+                    self.skipWaiting();
+                });
+                
+                self.addEventListener('activate', (event) => {
+                    event.waitUntil(clients.claim());
+                });
+                
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(
+                        caches.match(event.request).then((response) => {
+                            return response || fetch(event.request).then((response) => {
+                                return caches.open(CACHE_NAME).then((cache) => {
+                                    cache.put(event.request, response.clone());
+                                    return response;
+                                });
+                            });
+                        })
+                    );
+                });
+            `;
+            
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(swBlob);
+            
+            navigator.serviceWorker.register(swURL).then(() => {
+                console.log('Service Worker registered');
+            }).catch((error) => {
+                console.log('Service Worker registration failed:', error);
+            });
+        }
+    </script>
 </body>
 </html>
