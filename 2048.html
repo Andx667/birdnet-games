@@ -127,20 +127,23 @@
             transform: translateY(-1px);
         }
 
-        .game-container {
-            background: white;
-            padding: clamp(12px, 2vw, 20px);
-            border-radius: clamp(8px, 1.5vw, 12px);
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: relative;
+        .grid-wrapper {
             flex: 1;
             min-width: 0;
             display: flex;
             flex-direction: column;
+            gap: 20px;
         }
 
         .grid-container {
+            background: white;
+            padding: clamp(15px, 2vw, 25px);
+            border-radius: clamp(8px, 1.5vw, 12px);
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .game-board {
             background: #bbada0;
             border-radius: 8px;
             padding: clamp(8px, 1.5vw, 15px);
@@ -227,19 +230,20 @@
         }
 
         .game-message {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            border-radius: 8px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border-radius: 12px;
+            padding: 40px;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 100;
             animation: fadeIn 0.3s;
+            min-width: 300px;
         }
 
         .game-message.show {
@@ -274,40 +278,30 @@
 
         .instructions {
             background: white;
-            padding: clamp(15px, 3vw, 20px);
+            padding: clamp(15px, 2vw, 25px);
             border-radius: clamp(8px, 1.5vw, 12px);
             border: 1px solid #e0e0e0;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
         }
 
         .instructions h3 {
             color: #1976d2;
             margin-bottom: 10px;
+            font-size: clamp(1rem, 2vw, 1.2rem);
         }
 
         .instructions p {
             color: #666;
             line-height: 1.6;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: clamp(0.85rem, 1.5vw, 1rem);
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
             color: #666;
-        }
-
-        footer {
-            text-align: center;
-            padding: 15px;
-            color: #666;
-            font-size: 0.85rem;
-        }
-
-        footer a {
-            color: #1976d2;
-            text-decoration: none;
+            font-size: clamp(1rem, 2vw, 1.2rem);
         }
 
         .back-link {
@@ -331,6 +325,10 @@
             header {
                 width: 100%;
                 position: static;
+            }
+            
+            .grid-wrapper {
+                width: 100%;
             }
             
             .controls {
@@ -387,46 +385,44 @@
             </div>
         </header>
 
-        <div class="game-container">
-            <div id="loading" class="loading">Loading bird data from BirdNET...</div>
-            <div id="gameBoard" class="grid-container" style="display: none;">
-                <!-- Grid cells -->
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                
-                <div class="tile-container" id="tileContainer"></div>
-                
-                <div class="game-message" id="gameMessage">
-                    <h2 id="messageText">Game Over!</h2>
-                    <p id="messageScore">Final Score: 0</p>
-                    <button onclick="game.restart()">Try Again</button>
+        <div class="grid-wrapper">
+            <div class="grid-container" id="gridContainer">
+                <div id="loading" class="loading">Loading bird data from BirdNET...</div>
+                <div id="gameBoard" class="game-board" style="display: none;">
+                    <!-- Grid cells -->
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    
+                    <div class="tile-container" id="tileContainer"></div>
                 </div>
             </div>
-        </div>
 
-        <div class="instructions">
-            <h3>How to Play</h3>
-            <p>Use arrow keys (or swipe on mobile) to move tiles. When two tiles with the same bird species touch, they merge into a rarer bird!</p>
-            <p>Progress from common to rare birds. Can you discover the rarest species?</p>
+            <div class="instructions">
+                <h3>How to Play</h3>
+                <p>Use arrow keys (or swipe on mobile) to move tiles. When two tiles with the same bird species touch, they merge into a rarer bird!</p>
+                <p>Progress from common to rare birds. Can you discover the rarest species?</p>
+            </div>
         </div>
+    </div>
 
-        <footer>
-            <p>Data from <a href="https://birdnet.cornell.edu" target="_blank">BirdNET API</a></p>
-        </footer>
+    <div class="game-message" id="gameMessage">
+        <h2 id="messageText">Game Over!</h2>
+        <p id="messageScore">Final Score: 0</p>
+        <button onclick="game.restart()">Try Again</button>
     </div>
 
     <script>
