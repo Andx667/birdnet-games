@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1976d2">
+    <meta name="description" content="BirdNET Same Game - Remove connected bird groups in this classic puzzle game">
+    <title>BirdNET Same Game</title>
+    
+    <link rel="manifest" href="#" id="manifest-placeholder">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: clamp(10px, 2vw, 30px);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: min(1400px, 95vw);
+            width: 100%;
+            display: flex;
+            gap: clamp(15px, 2vw, 25px);
+            align-items: flex-start;
+        }
+
+        header {
+            background: white;
+            padding: clamp(15px, 2vw, 25px);
+            border-radius: clamp(6px, 1vw, 12px);
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            flex: 0 0 auto;
+            width: clamp(220px, 28vw, 320px);
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+        }
+
+        h1 {
+            color: #1976d2;
+            margin-bottom: 3px;
+            font-size: clamp(1.1rem, 3vw, 2rem);
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(6px, 1vw, 10px);
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            width: clamp(28px, 4vw, 48px);
+            height: clamp(28px, 4vw, 48px);
+            object-fit: contain;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: clamp(0.75rem, 1.5vw, 0.95rem);
+            margin-bottom: clamp(8px, 1.5vw, 12px);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.5vw, 12px);
+            margin-bottom: clamp(12px, 2vw, 20px);
+        }
+
+        .stats {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(10px, 2vw, 15px);
+            font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+            color: #333;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: clamp(8px, 1.5vw, 12px);
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            font-size: clamp(0.7rem, 1.3vw, 0.9rem);
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            color: #1976d2;
+        }
+
+        button {
+            padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2.5vw, 24px);
+            font-size: clamp(13px, 1.8vw, 18px);
+            border: 1px solid #1976d2;
+            border-radius: clamp(4px, 0.8vw, 8px);
+            cursor: pointer;
+            background: #1976d2;
+            color: white;
+            transition: all 0.2s;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(25, 118, 210, 0.2);
+            touch-action: manipulation;
+            min-height: 40px;
+        }
+
+        button:hover {
+            background: #1565c0;
+            border-color: #1565c0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        select {
+            padding: clamp(10px, 1.5vw, 14px) clamp(12px, 2vw, 16px);
+            font-size: clamp(13px, 1.8vw, 18px);
+            border: 1px solid #ddd;
+            border-radius: clamp(4px, 0.8vw, 8px);
+            cursor: pointer;
+            background: white;
+            color: #333;
+            font-weight: 500;
+            min-height: 40px;
+        }
+
+        select:hover {
+            border-color: #1976d2;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+
+        .game-board {
+            display: grid;
+            gap: clamp(4px, 0.8vw, 8px);
+            padding: clamp(15px, 2vw, 25px);
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: clamp(6px, 1vw, 12px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 0;
+            align-self: flex-start;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            border: 2px solid rgba(255,255,255,0.5);
+            touch-action: manipulation;
+            min-width: 40px;
+            min-height: 40px;
+        }
+
+        .cell:not(.empty):hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+        }
+
+        .cell.empty {
+            background: transparent !important;
+            cursor: default;
+            border: none;
+            box-shadow: none;
+        }
+
+        .cell.highlight {
+            animation: pulse 0.5s ease-in-out infinite;
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.8);
+        }
+
+        .cell.removing {
+            animation: removeCell 0.4s ease-out forwards;
+        }
+
+        .bird-image {
+            max-width: 75%;
+            max-height: 75%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .bird-emoji {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        @keyframes removeCell {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        .victory-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .victory-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: clamp(25px, 5vw, 50px);
+            border-radius: clamp(6px, 1vw, 12px);
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: scaleIn 0.5s;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            color: #1976d2;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            margin-bottom: clamp(15px, 3vw, 25px);
+            font-weight: 600;
+        }
+
+        .modal-content p {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            margin-bottom: clamp(8px, 1.5vw, 15px);
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); }
+            to { transform: scale(1); }
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: clamp(0.85rem, 1.8vw, 1rem);
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .fullscreen-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #1976d2;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 100;
+            padding: 0;
+        }
+
+        .fullscreen-fab:hover {
+            background: #1565c0;
+            transform: scale(1.1);
+        }
+
+        .install-prompt {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 280px;
+            z-index: 100;
+        }
+
+        .install-prompt.show {
+            display: flex;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        footer {
+            color: #666;
+            text-align: center;
+            padding: clamp(15px, 2vw, 25px);
+            font-size: clamp(0.75rem, 1.8vw, 1.1rem);
+            line-height: 1.6;
+        }
+
+        footer a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-line {
+            margin-top: 5px;
+        }
+
+        .footer-status {
+            font-size: 0.85em;
+        }
+
+        .footer-source {
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            header {
+                width: 100%;
+                position: static;
+            }
+
+            .game-board {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="install-prompt" id="installPrompt">
+        <p style="margin: 0; font-weight: 600; color: #1976d2;">Install BirdNET Same Game</p>
+        <p style="margin: 0; font-size: 0.9em; color: #666;">Add to your home screen for quick access!</p>
+        <button id="installButton">Install</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <a href="index.html" class="back-link">← Back to Games</a>
+            <h1>
+                <img src="https://birdnet.cornell.edu/img/logo-birdnet-circle.png" alt="BirdNET Logo" class="logo">
+                Same Game
+            </h1>
+            <div class="subtitle">Remove connected bird groups!</div>
+            
+            <div class="controls">
+                <select id="gridSize">
+                    <option value="10">10x10 Grid</option>
+                    <option value="12">12x12 Grid</option>
+                    <option value="15" selected>15x15 Grid</option>
+                </select>
+                
+                <select id="colorCount">
+                    <option value="3">3 Colors</option>
+                    <option value="4">4 Colors</option>
+                    <option value="5" selected>5 Colors</option>
+                    <option value="6">6 Colors</option>
+                </select>
+                
+                <button id="newGameBtn">New Game</button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="scoreDisplay">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Moves</span>
+                    <span class="stat-value" id="movesDisplay">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Remaining</span>
+                    <span class="stat-value" id="remainingDisplay">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="game-board" id="gameBoard"></div>
+    </div>
+
+    <div class="victory-modal" id="victoryModal">
+        <div class="modal-content">
+            <h2 id="victoryTitle">🎉 Game Complete! 🎉</h2>
+            <p id="victoryMessage"></p>
+            <p>Final Score: <strong id="finalScore">0</strong></p>
+            <p>Moves: <strong id="finalMoves">0</strong></p>
+            <p>Cells Cleared: <strong id="cellsCleared">0</strong></p>
+            <button id="playAgainBtn">Play Again</button>
+        </div>
+    </div>
+
+    <button class="fullscreen-fab" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+
+    <footer>
+        <p>Remove connected bird groups to score points! Inspired by <a href="https://birdnet.cornell.edu" target="_blank">BirdNET</a></p>
+        <p class="footer-line footer-status" id="dataSource">Loading bird observations...</p>
+        <p class="footer-line footer-source">Data source: <a href="https://birdnet.cornell.edu/api2/requeststats" target="_blank">BirdNET API</a></p>
+        <p class="footer-line">This project is open source on <a href="https://github.com/Andx667/birdnet-games" target="_blank">GitHub</a></p>
+    </footer>
+
+    <script>
+        // Bird data will be loaded from BirdNET API
+        let BIRDS = [];
+        let BIRD_DATA_SOURCE = 'Loading...';
+
+        // Fallback bird emojis if API fails
+        const FALLBACK_BIRDS = [
+            '🦅', '🦆', '🦉', '🦚', '🦜', '🦢', '🕊️', '🦃',
+            '🐦', '🐧', '🦩', '🐔', '🐓', '🦤', '🪶', '🦇'
+        ];
+
+        const BIRDNET = {
+            apiUrl: 'https://birdnet.cornell.edu/api2/requeststats',
+            iconUrl: 'https://birdnet.cornell.edu/img/logo-birdnet-circle.png',
+            themeColor: '#1976d2'
+        };
+
+        const BIRDNET_DATA_WINDOW_HOURS = 24;
+
+        // Color palette for the game
+        const COLORS = [
+            '#e91e63', // Pink
+            '#2196f3', // Blue
+            '#4caf50', // Green
+            '#ff9800', // Orange
+            '#9c27b0', // Purple
+            '#f44336', // Red
+        ];
+
+        function setFooterDataSourceText(text) {
+            const sourceElement = document.getElementById('dataSource');
+            if (sourceElement) {
+                sourceElement.textContent = text;
+            }
+        }
+
+        function formatBirdnetLiveData({ totalObservations, uniqueSpecies, hours = BIRDNET_DATA_WINDOW_HOURS }) {
+            const safeHours = Number.isFinite(hours) && hours > 0 ? Math.round(hours) : BIRDNET_DATA_WINDOW_HOURS;
+            const obsText = Number.isFinite(totalObservations) ? totalObservations.toLocaleString() : '0';
+            const speciesText = Number.isFinite(uniqueSpecies) ? uniqueSpecies.toLocaleString() : '0';
+            return `Live data from BirdNET (${obsText} observations, ${speciesText} species in last ${safeHours}h)`;
+        }
+
+        // Fetch most common bird observations from BirdNET API
+        async function fetchBirdData() {
+            try {
+                const response = await fetch(BIRDNET.apiUrl);
+                const data = await response.json();
+                
+                // Extract observations array and count species occurrences
+                const observations = data.observations || [];
+                const speciesMap = {};
+                
+                observations.forEach(obs => {
+                    const species = obs.species;
+                    if (species) {
+                        const [commonName, scientificName] = species.split(';');
+                        if (!speciesMap[commonName]) {
+                            speciesMap[commonName] = {
+                                name: commonName,
+                                scientificName: scientificName,
+                                count: 0
+                            };
+                        }
+                        speciesMap[commonName].count++;
+                    }
+                });
+                
+                // Sort by count (most common first)
+                const speciesData = Object.values(speciesMap)
+                    .sort((a, b) => b.count - a.count);
+                
+                if (speciesData.length > 0) {
+                    // Get top species and create bird representations with images
+                    BIRDS = speciesData.slice(0, 16).map(species => ({
+                        name: species.name,
+                        scientificName: species.scientificName,
+                        imageUrl: `https://birdnet.cornell.edu/api2/bird/${encodeURIComponent(species.scientificName)}.webp`,
+                        count: species.count,
+                        useImage: true
+                    }));
+                    
+                    const totalObservations = observations.length;
+                    const uniqueSpecies = speciesData.length;
+                    BIRD_DATA_SOURCE = formatBirdnetLiveData({ totalObservations, uniqueSpecies, hours: BIRDNET_DATA_WINDOW_HOURS });
+                } else {
+                    useFallbackBirds();
+                }
+            } catch (error) {
+                console.error('Failed to fetch bird data:', error);
+                useFallbackBirds();
+            }
+        }
+
+        function useFallbackBirds() {
+            BIRDS = FALLBACK_BIRDS.map((emoji, index) => ({ 
+                emoji, 
+                name: `Bird ${index + 1}`, 
+                count: 0,
+                useImage: false
+            }));
+            BIRD_DATA_SOURCE = 'Using fallback data';
+        }
+
+        function getBirdEmoji(speciesName) {
+            // Map common bird names to emojis
+            const name = speciesName.toLowerCase();
+            if (name.includes('owl')) return '🦉';
+            if (name.includes('duck')) return '🦆';
+            if (name.includes('eagle') || name.includes('hawk')) return '🦅';
+            if (name.includes('swan')) return '🦢';
+            if (name.includes('dove') || name.includes('pigeon')) return '🕊️';
+            if (name.includes('parrot') || name.includes('macaw')) return '🦜';
+            if (name.includes('flamingo')) return '🦩';
+            if (name.includes('penguin')) return '🐧';
+            if (name.includes('chicken') || name.includes('hen')) return '🐔';
+            if (name.includes('rooster')) return '🐓';
+            if (name.includes('turkey')) return '🦃';
+            if (name.includes('peacock')) return '🦚';
+            if (name.includes('dodo')) return '🦤';
+            if (name.includes('crow') || name.includes('raven') || name.includes('blackbird')) return '🐦‍⬛';
+            // Default bird emoji
+            return '🐦';
+        }
+
+        // Initialize data fetch
+        fetchBirdData().then(() => {
+            setFooterDataSourceText(BIRD_DATA_SOURCE);
+        });
+
+        // Game logic
+        class SameGame {
+            constructor() {
+                this.gameBoard = document.getElementById('gameBoard');
+                this.scoreDisplay = document.getElementById('scoreDisplay');
+                this.movesDisplay = document.getElementById('movesDisplay');
+                this.remainingDisplay = document.getElementById('remainingDisplay');
+                this.victoryModal = document.getElementById('victoryModal');
+                this.gridSizeSelect = document.getElementById('gridSize');
+                this.colorCountSelect = document.getElementById('colorCount');
+                
+                this.gridSize = parseInt(this.gridSizeSelect.value);
+                this.colorCount = parseInt(this.colorCountSelect.value);
+                this.grid = [];
+                this.score = 0;
+                this.moves = 0;
+                this.totalCellsCleared = 0;
+                
+                this.setupEventListeners();
+                this.initGame();
+            }
+
+            setupEventListeners() {
+                document.getElementById('newGameBtn').addEventListener('click', () => this.initGame());
+                document.getElementById('playAgainBtn').addEventListener('click', () => {
+                    this.victoryModal.classList.remove('show');
+                    this.initGame();
+                });
+                
+                this.gridSizeSelect.addEventListener('change', () => {
+                    this.gridSize = parseInt(this.gridSizeSelect.value);
+                    this.initGame();
+                });
+                
+                this.colorCountSelect.addEventListener('change', () => {
+                    this.colorCount = parseInt(this.colorCountSelect.value);
+                    this.initGame();
+                });
+            }
+
+            initGame() {
+                this.score = 0;
+                this.moves = 0;
+                this.totalCellsCleared = 0;
+                this.grid = [];
+                
+                // Create grid
+                for (let row = 0; row < this.gridSize; row++) {
+                    this.grid[row] = [];
+                    for (let col = 0; col < this.gridSize; col++) {
+                        const colorIndex = Math.floor(Math.random() * this.colorCount);
+                        const birdIndex = colorIndex % BIRDS.length;
+                        this.grid[row][col] = {
+                            color: COLORS[colorIndex],
+                            colorIndex: colorIndex,
+                            bird: BIRDS[birdIndex] || FALLBACK_BIRDS[birdIndex],
+                            isEmpty: false
+                        };
+                    }
+                }
+                
+                this.renderBoard();
+                this.updateDisplay();
+            }
+
+            renderBoard() {
+                this.gameBoard.innerHTML = '';
+                this.gameBoard.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+                
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        const cellData = this.grid[row][col];
+                        
+                        if (cellData.isEmpty) {
+                            cell.classList.add('empty');
+                        } else {
+                            cell.style.background = cellData.color;
+                            
+                            if (cellData.bird.useImage) {
+                                const img = document.createElement('img');
+                                img.className = 'bird-image';
+                                img.src = cellData.bird.imageUrl;
+                                img.alt = cellData.bird.name;
+                                img.title = cellData.bird.name;
+                                cell.appendChild(img);
+                            } else {
+                                const emoji = document.createElement('div');
+                                emoji.className = 'bird-emoji';
+                                emoji.textContent = cellData.bird.emoji || getBirdEmoji(cellData.bird.name);
+                                emoji.title = cellData.bird.name;
+                                cell.appendChild(emoji);
+                            }
+                            
+                            cell.addEventListener('click', () => this.handleCellClick(row, col));
+                            cell.addEventListener('mouseenter', () => this.highlightGroup(row, col, true));
+                            cell.addEventListener('mouseleave', () => this.highlightGroup(row, col, false));
+                        }
+                        
+                        this.gameBoard.appendChild(cell);
+                    }
+                }
+            }
+
+            handleCellClick(row, col) {
+                const cellData = this.grid[row][col];
+                if (cellData.isEmpty) return;
+                
+                const group = this.findConnectedGroup(row, col, cellData.colorIndex);
+                
+                // Need at least 2 connected cells
+                if (group.length < 2) return;
+                
+                // Clear the highlight first
+                this.highlightGroup(row, col, false);
+                
+                // Remove the group with animation
+                this.removeGroup(group);
+                
+                // Update score based on group size (n * (n-1))
+                const points = group.length * (group.length - 1);
+                this.score += points;
+                this.moves++;
+                this.totalCellsCleared += group.length;
+                
+                // Apply gravity after a short delay
+                setTimeout(() => {
+                    this.applyGravity();
+                    this.renderBoard();
+                    this.updateDisplay();
+                    
+                    // Check for game over
+                    if (this.isGameOver()) {
+                        this.handleGameOver();
+                    }
+                }, 400);
+            }
+
+            findConnectedGroup(row, col, colorIndex) {
+                const visited = new Set();
+                const group = [];
+                const stack = [[row, col]];
+                
+                while (stack.length > 0) {
+                    const [r, c] = stack.pop();
+                    const key = `${r},${c}`;
+                    
+                    if (visited.has(key)) continue;
+                    if (r < 0 || r >= this.gridSize || c < 0 || c >= this.gridSize) continue;
+                    if (this.grid[r][c].isEmpty) continue;
+                    if (this.grid[r][c].colorIndex !== colorIndex) continue;
+                    
+                    visited.add(key);
+                    group.push([r, c]);
+                    
+                    // Check orthogonal neighbors
+                    stack.push([r - 1, c]); // Up
+                    stack.push([r + 1, c]); // Down
+                    stack.push([r, c - 1]); // Left
+                    stack.push([r, c + 1]); // Right
+                }
+                
+                return group;
+            }
+
+            highlightGroup(row, col, highlight) {
+                const cellData = this.grid[row][col];
+                if (cellData.isEmpty) return;
+                
+                const group = this.findConnectedGroup(row, col, cellData.colorIndex);
+                if (group.length < 2) return;
+                
+                group.forEach(([r, c]) => {
+                    const cell = this.gameBoard.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                    if (cell) {
+                        if (highlight) {
+                            cell.classList.add('highlight');
+                        } else {
+                            cell.classList.remove('highlight');
+                        }
+                    }
+                });
+            }
+
+            removeGroup(group) {
+                group.forEach(([r, c]) => {
+                    const cell = this.gameBoard.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                    if (cell) {
+                        cell.classList.add('removing');
+                    }
+                    this.grid[r][c].isEmpty = true;
+                });
+            }
+
+            applyGravity() {
+                // First, make cells fall down
+                for (let col = 0; col < this.gridSize; col++) {
+                    let writePos = this.gridSize - 1;
+                    for (let row = this.gridSize - 1; row >= 0; row--) {
+                        if (!this.grid[row][col].isEmpty) {
+                            if (writePos !== row) {
+                                this.grid[writePos][col] = this.grid[row][col];
+                                this.grid[row][col] = { isEmpty: true };
+                            }
+                            writePos--;
+                        }
+                    }
+                }
+                
+                // Then, shift columns to the left
+                let writeCol = 0;
+                for (let col = 0; col < this.gridSize; col++) {
+                    // Check if column is empty
+                    const isEmpty = this.grid.every(row => row[col].isEmpty);
+                    
+                    if (!isEmpty) {
+                        if (writeCol !== col) {
+                            for (let row = 0; row < this.gridSize; row++) {
+                                this.grid[row][writeCol] = this.grid[row][col];
+                                this.grid[row][col] = { isEmpty: true };
+                            }
+                        }
+                        writeCol++;
+                    }
+                }
+            }
+
+            isGameOver() {
+                // Check if there are any valid moves left (groups of 2 or more)
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (!this.grid[row][col].isEmpty) {
+                            const group = this.findConnectedGroup(row, col, this.grid[row][col].colorIndex);
+                            if (group.length >= 2) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+
+            updateDisplay() {
+                this.scoreDisplay.textContent = this.score;
+                this.movesDisplay.textContent = this.moves;
+                
+                // Count remaining cells
+                let remaining = 0;
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (!this.grid[row][col].isEmpty) {
+                            remaining++;
+                        }
+                    }
+                }
+                this.remainingDisplay.textContent = remaining;
+            }
+
+            handleGameOver() {
+                // Count remaining cells
+                let remaining = 0;
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (!this.grid[row][col].isEmpty) {
+                            remaining++;
+                        }
+                    }
+                }
+                
+                // Bonus for clearing all cells
+                if (remaining === 0) {
+                    this.score += 1000;
+                    document.getElementById('victoryTitle').textContent = '🏆 Perfect Clear! 🏆';
+                    document.getElementById('victoryMessage').textContent = 'You cleared the entire board! +1000 bonus points!';
+                } else {
+                    document.getElementById('victoryTitle').textContent = '🎉 Game Complete! 🎉';
+                    document.getElementById('victoryMessage').textContent = `${remaining} cells remaining. Try to clear them all!`;
+                }
+                
+                document.getElementById('finalScore').textContent = this.score;
+                document.getElementById('finalMoves').textContent = this.moves;
+                document.getElementById('cellsCleared').textContent = this.totalCellsCleared;
+                
+                setTimeout(() => {
+                    this.victoryModal.classList.add('show');
+                }, 500);
+            }
+        }
+
+        // Fullscreen functionality
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function updateFullscreenButton() {
+            if (document.fullscreenElement) {
+                fullscreenBtn.textContent = '⛶';
+                fullscreenBtn.title = 'Exit Fullscreen';
+            } else {
+                fullscreenBtn.textContent = '⛶';
+                fullscreenBtn.title = 'Enter Fullscreen';
+            }
+        }
+
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            document.addEventListener('fullscreenchange', updateFullscreenButton);
+        }
+
+        // PWA functionality
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installButton = document.getElementById('installButton');
+
+        function setDynamicManifest(manifestObject) {
+            const manifestBlob = new Blob([JSON.stringify(manifestObject)], { type: 'application/json' });
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            const manifestLink = document.getElementById('manifest-placeholder');
+            if (manifestLink) {
+                manifestLink.setAttribute('href', manifestURL);
+            }
+        }
+
+        function buildInlineServiceWorkerCode({ cacheName }) {
+            return `
+                const CACHE_NAME = '${cacheName}';
+                const ALLOWED_ORIGINS = [self.location.origin, 'https://birdnet.cornell.edu'];
+                const API_PATH = '/api2/requeststats';
+                const BIRD_IMAGE_PREFIX = '/api2/bird/';
+
+                self.addEventListener('install', () => self.skipWaiting());
+
+                self.addEventListener('activate', (event) => {
+                    event.waitUntil((async () => {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map((key) => (key === CACHE_NAME ? Promise.resolve() : caches.delete(key))));
+                        await clients.claim();
+                    })());
+                });
+
+                async function cacheFirst(request) {
+                    const cached = await caches.match(request);
+                    if (cached) return cached;
+                    const response = await fetch(request);
+                    const cache = await caches.open(CACHE_NAME);
+                    cache.put(request, response.clone());
+                    return response;
+                }
+
+                async function networkFirst(request) {
+                    try {
+                        const response = await fetch(request);
+                        const cache = await caches.open(CACHE_NAME);
+                        cache.put(request, response.clone());
+                        return response;
+                    } catch (err) {
+                        const cached = await caches.match(request);
+                        if (cached) return cached;
+                        throw err;
+                    }
+                }
+
+                async function staleWhileRevalidate(request) {
+                    const cached = await caches.match(request);
+                    const fetchPromise = fetch(request).then(async (response) => {
+                        const cache = await caches.open(CACHE_NAME);
+                        cache.put(request, response.clone());
+                        return response;
+                    }).catch(() => null);
+                    return cached || (await fetchPromise);
+                }
+
+                self.addEventListener('fetch', (event) => {
+                    const request = event.request;
+                    if (request.method !== 'GET') return;
+
+                    const url = new URL(request.url);
+                    if (!ALLOWED_ORIGINS.includes(url.origin)) return;
+
+                    if (url.origin === 'https://birdnet.cornell.edu' && url.pathname === API_PATH) {
+                        event.respondWith(networkFirst(request));
+                        return;
+                    }
+
+                    if (url.origin === 'https://birdnet.cornell.edu' && url.pathname.startsWith(BIRD_IMAGE_PREFIX)) {
+                        event.respondWith(cacheFirst(request));
+                        return;
+                    }
+
+                    event.respondWith(staleWhileRevalidate(request));
+                });
+            `;
+        }
+
+        async function registerInlineServiceWorker({ cacheName, logLabel }) {
+            if (!('serviceWorker' in navigator)) return;
+            try {
+                const swCode = buildInlineServiceWorkerCode({ cacheName });
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swURL = URL.createObjectURL(swBlob);
+                await navigator.serviceWorker.register(swURL);
+                console.log(`${logLabel}: Service Worker registered`);
+            } catch (error) {
+                console.log(`${logLabel}: Service Worker registration failed:`, error);
+            }
+        }
+
+        // Create manifest dynamically
+        setDynamicManifest({
+            name: 'BirdNET Same Game',
+            short_name: 'BirdNET Same',
+            description: 'Remove connected bird groups in this classic puzzle game',
+            start_url: './',
+            display: 'standalone',
+            background_color: '#ffffff',
+            theme_color: BIRDNET.themeColor,
+            orientation: 'portrait',
+            icons: [
+                {
+                    src: BIRDNET.iconUrl,
+                    sizes: '512x512',
+                    type: 'image/png',
+                    purpose: 'any maskable'
+                }
+            ]
+        });
+
+        registerInlineServiceWorker({ cacheName: 'bird-samegame-v1', logLabel: 'BirdNET Same Game' });
+
+        // Install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.classList.add('show');
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                installPrompt.classList.remove('show');
+            }
+            
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installPrompt.classList.remove('show');
+            deferredPrompt = null;
+        });
+
+        // Initialize game
+        const game = new SameGame();
+    </script>
+</body>
+</html>
