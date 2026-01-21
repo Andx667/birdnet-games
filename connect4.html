@@ -422,6 +422,7 @@
             </div>
 
             <div class="controls">
+                <button id="undoBtn" style="background: #ff9800; border-color: #ff9800;">↶ Undo</button>
                 <button id="newGameBtn">New Game</button>
             </div>
         </header>
@@ -536,6 +537,7 @@
                 this.currentPlayer = 1;
                 this.gameOver = false;
                 this.winningCells = [];
+                this.stateHistory = []; // Store previous states for undo
                 
                 this.gameBoard = document.getElementById('gameBoard');
                 this.loading = document.getElementById('loading');
@@ -547,6 +549,7 @@
                 this.winnerDisplay = document.getElementById('winnerDisplay');
                 
                 document.getElementById('newGameBtn').addEventListener('click', () => this.restart());
+                document.getElementById('undoBtn').addEventListener('click', () => this.undoMove());
             }
 
             async init() {
@@ -564,6 +567,8 @@
             createBoard() {
                 this.board = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
                 this.gameBoard.innerHTML = '';
+                this.stateHistory = []; // Clear history on new board
+                this.updateUndoButton();
                 
                 for (let row = 0; row < this.rows; row++) {
                     for (let col = 0; col < this.cols; col++) {
@@ -582,6 +587,9 @@
                 
                 const row = this.getLowestEmptyRow(col);
                 if (row === -1) return;
+                
+                // Save current state for undo
+                this.saveState();
                 
                 this.board[row][col] = this.currentPlayer;
                 this.renderPiece(row, col, this.currentPlayer);
@@ -718,6 +726,65 @@
                 this.messageText.textContent = "It's a draw! 🤝";
                 this.winnerDisplay.textContent = '';
                 this.gameMessage.classList.add('show');
+            }
+
+            saveState() {
+                // Deep copy current state
+                const state = {
+                    board: this.board.map(row => [...row]),
+                    currentPlayer: this.currentPlayer,
+                    gameOver: this.gameOver,
+                    winningCells: [...this.winningCells]
+                };
+                this.stateHistory.push(state);
+                
+                // Limit history to last 20 moves to save memory
+                if (this.stateHistory.length > 20) {
+                    this.stateHistory.shift();
+                }
+                
+                this.updateUndoButton();
+            }
+
+            undoMove() {
+                if (this.stateHistory.length === 0 || this.gameOver) {
+                    return; // Nothing to undo or game is over
+                }
+                
+                // Restore previous state
+                const previousState = this.stateHistory.pop();
+                this.board = previousState.board.map(row => [...row]);
+                this.currentPlayer = previousState.currentPlayer;
+                this.gameOver = previousState.gameOver;
+                this.winningCells = [...previousState.winningCells];
+                
+                this.renderBoard();
+                this.updateStatus();
+                this.updateUndoButton();
+            }
+
+            renderBoard() {
+                // Clear all pieces
+                const pieces = this.gameBoard.querySelectorAll('.piece');
+                pieces.forEach(piece => piece.remove());
+                
+                // Re-render all pieces from board state
+                for (let row = 0; row < this.rows; row++) {
+                    for (let col = 0; col < this.cols; col++) {
+                        if (this.board[row][col] !== 0) {
+                            this.renderPiece(row, col, this.board[row][col]);
+                        }
+                    }
+                }
+            }
+
+            updateUndoButton() {
+                const undoBtn = document.getElementById('undoBtn');
+                if (undoBtn) {
+                    undoBtn.disabled = this.stateHistory.length === 0 || this.gameOver;
+                    undoBtn.style.opacity = (this.stateHistory.length === 0 || this.gameOver) ? '0.5' : '1';
+                    undoBtn.style.cursor = (this.stateHistory.length === 0 || this.gameOver) ? 'not-allowed' : 'pointer';
+                }
             }
 
             restart() {
