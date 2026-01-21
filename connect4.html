@@ -676,6 +676,18 @@
                 return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
             };
             
+            // Normalize colors for comparison (ensure lowercase and 6-digit format)
+            const normalizeColor = (hex) => {
+                if (hex.length === 4) {
+                    // Convert #abc to #aabbcc
+                    return '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+                }
+                return hex.toLowerCase();
+            };
+            
+            const normalized1 = normalizeColor(color1);
+            const normalized2 = normalizeColor(color2);
+            
             // Try darkening first
             let adjusted = adjustBrightness(color2, -80);
             if (getContrastRatio(color1, adjusted) >= minContrast) {
@@ -689,14 +701,19 @@
             }
             
             // Last resort: use complementary high-contrast colors
-            const alternates = ['#d32f2f', '#0d47a1', '#388e3c', '#f57c00', '#7b1fa2', '#00897b'];  // Using darker blue
+            const alternates = ['#d32f2f', '#0d47a1', '#388e3c', '#f57c00', '#7b1fa2', '#00897b'];
             for (const alt of alternates) {
+                // Skip if this alternate is the same as color1
+                if (normalizeColor(alt) === normalized1) {
+                    continue;
+                }
                 if (getContrastRatio(color1, alt) >= minContrast) {
                     return alt;
                 }
             }
             
-            return color2; // Give up and return original
+            // Absolute fallback: return a color that's definitely different from color1
+            return normalized1 === '#d32f2f' ? '#0d47a1' : '#d32f2f';
         }
 
         class ConnectFour {
