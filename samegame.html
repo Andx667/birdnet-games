@@ -173,6 +173,9 @@
             flex: 1;
             min-width: 0;
             align-self: flex-start;
+            max-height: calc(100vh - 40px);
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .cell {
@@ -187,8 +190,10 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
             border: 2px solid rgba(255,255,255,0.5);
             touch-action: manipulation;
-            min-width: 40px;
-            min-height: 40px;
+            min-width: 30px;
+            min-height: 30px;
+            max-width: 60px;
+            max-height: 60px;
         }
 
         .cell:not(.empty):hover {
@@ -431,9 +436,10 @@
             
             <div class="controls">
                 <select id="gridSize">
-                    <option value="10">10x10 Grid</option>
+                    <option value="8">8x8 Grid</option>
+                    <option value="10" selected>10x10 Grid</option>
                     <option value="12">12x12 Grid</option>
-                    <option value="15" selected>15x15 Grid</option>
+                    <option value="15">15x15 Grid</option>
                 </select>
                 
                 <select id="colorCount">
@@ -563,14 +569,45 @@
                     .sort((a, b) => b.count - a.count);
                 
                 if (speciesData.length > 0) {
-                    // Get top species and create bird representations with images
-                    BIRDS = speciesData.slice(0, 16).map(species => ({
-                        name: species.name,
-                        scientificName: species.scientificName,
-                        imageUrl: `https://birdnet.cornell.edu/api2/bird/${encodeURIComponent(species.scientificName)}.webp`,
-                        count: species.count,
-                        useImage: true
-                    }));
+                    // Select birds across the rarity spectrum for better gameplay variety
+                    // Take some common birds and some rarer ones
+                    const selectedBirds = [];
+                    const totalSpecies = speciesData.length;
+                    
+                    // Strategy: pick birds at different percentiles
+                    // This ensures we get common, uncommon, and rare birds
+                    const indices = [
+                        0,  // Most common
+                        Math.floor(totalSpecies * 0.1), // Top 10%
+                        Math.floor(totalSpecies * 0.2), // Top 20%
+                        Math.floor(totalSpecies * 0.3), // Top 30%
+                        Math.floor(totalSpecies * 0.4), // Top 40%
+                        Math.floor(totalSpecies * 0.5), // Median
+                        Math.floor(totalSpecies * 0.6), // Top 60%
+                        Math.floor(totalSpecies * 0.7), // Top 70%
+                        Math.floor(totalSpecies * 0.8), // Top 80%
+                        Math.floor(totalSpecies * 0.85), // Top 85%
+                        Math.floor(totalSpecies * 0.9), // Top 90%
+                        Math.floor(totalSpecies * 0.93), // Top 93%
+                        Math.floor(totalSpecies * 0.95), // Top 95%
+                        Math.floor(totalSpecies * 0.97), // Top 97%
+                        Math.floor(totalSpecies * 0.98), // Top 98%
+                        Math.floor(totalSpecies * 0.99)  // Top 99%
+                    ];
+                    
+                    // Remove duplicates and take first 16
+                    const uniqueIndices = [...new Set(indices)].slice(0, 16);
+                    
+                    BIRDS = uniqueIndices.map(idx => {
+                        const species = speciesData[Math.min(idx, totalSpecies - 1)];
+                        return {
+                            name: species.name,
+                            scientificName: species.scientificName,
+                            imageUrl: `https://birdnet.cornell.edu/api2/bird/${encodeURIComponent(species.scientificName)}.webp`,
+                            count: species.count,
+                            useImage: true
+                        };
+                    });
                     
                     const totalObservations = observations.length;
                     const uniqueSpecies = speciesData.length;
@@ -608,6 +645,41 @@
             if (name.includes('crow') || name.includes('raven') || name.includes('blackbird')) return '🐦‍⬛';
             // Default bird emoji
             return '🐦';
+        }
+
+        // Helper function for weighted random selection based on bird rarity
+        function getWeightedBirdIndex(colorCount) {
+            // Get birds for the selected color count
+            const availableBirds = BIRDS.slice(0, colorCount);
+            
+            // If using fallback birds (no counts), use uniform distribution
+            const hasRealCounts = availableBirds.some(b => b.count > 0);
+            if (!hasRealCounts) {
+                return Math.floor(Math.random() * colorCount);
+            }
+            
+            // Apply logarithmic scaling to prevent extreme rarity
+            // This ensures rare birds still appear, just less frequently
+            const weights = availableBirds.map(bird => {
+                // Use log scale to compress the range: log(count + 1) + minimum weight
+                const logWeight = Math.log(bird.count + 1) + 1;
+                return logWeight;
+            });
+            
+            // Calculate total weight
+            const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+            
+            // Random selection based on weights
+            let random = Math.random() * totalWeight;
+            for (let i = 0; i < weights.length; i++) {
+                random -= weights[i];
+                if (random <= 0) {
+                    return i;
+                }
+            }
+            
+            // Fallback (should rarely happen)
+            return colorCount - 1;
         }
 
         // Game logic
@@ -656,11 +728,12 @@
                 this.totalCellsCleared = 0;
                 this.grid = [];
                 
-                // Create grid
+                // Create grid with weighted bird distribution
                 for (let row = 0; row < this.gridSize; row++) {
                     this.grid[row] = [];
                     for (let col = 0; col < this.gridSize; col++) {
-                        const colorIndex = Math.floor(Math.random() * this.colorCount);
+                        // Use weighted selection based on bird observation counts
+                        const colorIndex = getWeightedBirdIndex(this.colorCount);
                         const birdIndex = colorIndex % BIRDS.length;
                         this.grid[row][col] = {
                             color: COLORS[colorIndex],
