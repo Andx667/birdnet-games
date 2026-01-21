@@ -381,6 +381,38 @@
                 padding: 12px;
             }
         }
+
+        .game-info-box {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #undoBtn {
+            background: #ff9800;
+            border-color: #ff9800;
+        }
+
+        #undoBtn:hover {
+            background: #f57c00;
+        }
+
+        .winner-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: block;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
@@ -398,20 +430,20 @@
             </h1>
             <div class="subtitle">Four in a row wins!</div>
             
-            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 0.85rem; color: #555; line-height: 1.4;">
+            <div class="game-info-box">
                 <strong>How to Play:</strong> Drop birds into columns to connect four of your color vertically, horizontally, or diagonally.<br>
                 <strong>Birds:</strong> Each game features a random common vs. rare bird from live BirdNET data. Colors match the birds' names!
             </div>
             
             <div class="game-status">
                 <div class="status-text" id="statusText">Loading birds...</div>
-                <div class="player-indicator" id="playerIndicator" style="display: none;">
+                <div class="player-indicator hidden" id="playerIndicator">
                     <div class="player-piece" id="currentPiece"></div>
                 </div>
             </div>
 
             <div class="controls">
-                <button id="undoBtn" style="background: #ff9800; border-color: #ff9800;">↶ Undo</button>
+                <button id="undoBtn">↶ Undo</button>
                 <button id="newGameBtn">New Game</button>
             </div>
         </header>
@@ -419,7 +451,7 @@
         <div class="grid-wrapper">
             <div class="grid-container" id="gridContainer">
                 <div id="loading" class="loading">Loading bird data from BirdNET...</div>
-                <div id="gameBoard" class="game-board" style="display: none;"></div>
+                <div id="gameBoard" class="game-board hidden"></div>
             </div>
         </div>
     </div>
@@ -703,8 +735,8 @@
                     // Apply colors to CSS
                     this.applyPlayerColors();
                     
-                    this.loading.style.display = 'none';
-                    this.gameBoard.style.display = 'grid';
+                    this.loading.classList.add('hidden');
+                    this.gameBoard.classList.remove('hidden');
                     this.createBoard();
                     this.updateStatus();
                 } else {
@@ -803,7 +835,7 @@
                     img.src = bird.imageUrl;
                     img.alt = bird.name;
                     img.onerror = () => {
-                        img.style.display = 'none';
+                        img.classList.add('hidden');
                     };
                     piece.appendChild(img);
                 }
@@ -876,7 +908,7 @@
                     const bird = BIRDS[this.currentPlayer - 1];
                     this.statusText.textContent = `${bird.name}'s turn`;
                     this.currentPiece.className = `player-piece player${this.currentPlayer}-piece`;
-                    this.playerIndicator.style.display = 'flex';
+                    this.playerIndicator.classList.remove('hidden');
                 } else {
                     this.statusText.textContent = `Player ${this.currentPlayer}'s turn`;
                 }
@@ -887,7 +919,7 @@
                     // BIRDS array contains the two rarest birds [0, 1]
                     const bird = BIRDS[this.currentPlayer - 1];
                     this.messageText.textContent = `${bird.name} wins! 🎉`;
-                    this.winnerDisplay.innerHTML = `<img src="${bird.imageUrl}" alt="${bird.name}" style="width: 120px; height: 120px; border-radius: 50%; margin: 20px auto; display: block; object-fit: contain;">`;
+                    this.winnerDisplay.innerHTML = `<img src="${bird.imageUrl}" alt="${bird.name}" class="winner-image">`;
                 } else {
                     this.messageText.textContent = `Player ${this.currentPlayer} wins! 🎉`;
                     this.winnerDisplay.textContent = '';
