@@ -213,6 +213,23 @@
             box-shadow: 0 0 15px rgba(25, 118, 210, 0.8);
         }
 
+        .cell.hint {
+            animation: hintPulse 1s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.9);
+            border: 3px solid #4caf50;
+        }
+
+        @keyframes hintPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(76, 175, 80, 0.9);
+            }
+            50% { 
+                transform: scale(1.2);
+                box-shadow: 0 0 30px rgba(76, 175, 80, 1);
+            }
+        }
+
         .cell.removing {
             animation: removeCell 0.4s ease-out forwards;
         }
@@ -449,6 +466,7 @@
                     <option value="6">6 Colors</option>
                 </select>
                 
+                <button id="hintBtn" style="background: #4caf50; border-color: #4caf50;">💡 Get Hint</button>
                 <button id="newGameBtn">New Game</button>
             </div>
             
@@ -706,6 +724,7 @@
 
             setupEventListeners() {
                 document.getElementById('newGameBtn').addEventListener('click', () => this.initGame());
+                document.getElementById('hintBtn').addEventListener('click', () => this.showHint());
                 document.getElementById('playAgainBtn').addEventListener('click', () => {
                     this.victoryModal.classList.remove('show');
                     this.initGame();
@@ -727,6 +746,7 @@
                 this.moves = 0;
                 this.totalCellsCleared = 0;
                 this.grid = [];
+                this.clearHint();
                 
                 // Create grid with weighted bird distribution
                 for (let row = 0; row < this.gridSize; row++) {
@@ -800,7 +820,8 @@
                 // Need at least 2 connected cells
                 if (group.length < 2) return;
                 
-                // Clear the highlight first
+                // Clear any hint and highlight first
+                this.clearHint();
                 this.highlightGroup(row, col, false);
                 
                 // Remove the group with animation
@@ -850,6 +871,198 @@
                 }
                 
                 return group;
+            }
+
+            // Deep copy grid for simulation
+            copyGrid() {
+                return this.grid.map(row => row.map(cell => ({...cell})));
+            }
+
+            // Find all valid moves (groups of 2+)
+            findAllMoves(grid = this.grid) {
+                const moves = [];
+                const checked = new Set();
+                
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        const key = `${row},${col}`;
+                        if (checked.has(key) || grid[row][col].isEmpty) continue;
+                        
+                        const group = this.findConnectedGroupInGrid(grid, row, col, grid[row][col].colorIndex);
+                        if (group.length >= 2) {
+                            moves.push({ row, col, group, score: group.length * (group.length - 1) });
+                            // Mark all cells in this group as checked
+                            group.forEach(([r, c]) => checked.add(`${r},${c}`));
+                        }
+                    }
+                }
+                
+                return moves;
+            }
+
+            // Find connected group in a specific grid (for simulation)
+            findConnectedGroupInGrid(grid, row, col, colorIndex) {
+                const visited = new Set();
+                const group = [];
+                const stack = [[row, col]];
+                
+                while (stack.length > 0) {
+                    const [r, c] = stack.pop();
+                    const key = `${r},${c}`;
+                    
+                    if (visited.has(key)) continue;
+                    if (r < 0 || r >= this.gridSize || c < 0 || c >= this.gridSize) continue;
+                    if (grid[r][c].isEmpty) continue;
+                    if (grid[r][c].colorIndex !== colorIndex) continue;
+                    
+                    visited.add(key);
+                    group.push([r, c]);
+                    
+                    stack.push([r - 1, c]);
+                    stack.push([r + 1, c]);
+                    stack.push([r, c - 1]);
+                    stack.push([r, c + 1]);
+                }
+                
+                return group;
+            }
+
+            // Simulate a move on a grid copy
+            simulateMove(grid, move) {
+                const newGrid = grid.map(row => row.map(cell => ({...cell})));
+                
+                // Remove the group
+                move.group.forEach(([r, c]) => {
+                    newGrid[r][c] = { isEmpty: true };
+                });
+                
+                // Apply gravity
+                this.applyGravityToGrid(newGrid);
+                
+                return newGrid;
+            }
+
+            // Apply gravity to a grid copy
+            applyGravityToGrid(grid) {
+                // Make cells fall down
+                for (let col = 0; col < this.gridSize; col++) {
+                    let writePos = this.gridSize - 1;
+                    for (let row = this.gridSize - 1; row >= 0; row--) {
+                        if (!grid[row][col].isEmpty) {
+                            if (writePos !== row) {
+                                grid[writePos][col] = grid[row][col];
+                                grid[row][col] = { isEmpty: true };
+                            }
+                            writePos--;
+                        }
+                    }
+                }
+                
+                // Shift columns to the left
+                let writeCol = 0;
+                for (let col = 0; col < this.gridSize; col++) {
+                    const isEmpty = grid.every(row => row[col].isEmpty);
+                    
+                    if (!isEmpty) {
+                        if (writeCol !== col) {
+                            for (let row = 0; row < this.gridSize; row++) {
+                                grid[row][writeCol] = grid[row][col];
+                                grid[row][col] = { isEmpty: true };
+                            }
+                        }
+                        writeCol++;
+                    }
+                }
+            }
+
+            // Evaluate board state (lower remaining cells = better)
+            evaluateBoard(grid) {
+                let remaining = 0;
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (!grid[row][col].isEmpty) remaining++;
+                    }
+                }
+                return remaining;
+            }
+
+            // Recursive lookahead with limited depth
+            lookahead(grid, depth, maxDepth = 3) {
+                if (depth >= maxDepth) {
+                    return this.evaluateBoard(grid);
+                }
+                
+                const moves = this.findAllMoves(grid);
+                if (moves.length === 0) {
+                    return this.evaluateBoard(grid);
+                }
+                
+                let bestScore = Infinity;
+                for (const move of moves) {
+                    const newGrid = this.simulateMove(grid, move);
+                    const score = this.lookahead(newGrid, depth + 1, maxDepth);
+                    bestScore = Math.min(bestScore, score);
+                }
+                
+                return bestScore;
+            }
+
+            // Show hint - find and highlight best move
+            showHint() {
+                // Clear any existing hints
+                this.clearHint();
+                
+                const moves = this.findAllMoves();
+                if (moves.length === 0) {
+                    alert('No moves available!');
+                    return;
+                }
+                
+                // Evaluate each move with lookahead
+                let bestMove = null;
+                let bestEvaluation = Infinity;
+                
+                for (const move of moves) {
+                    const newGrid = this.simulateMove(this.grid, move);
+                    // Score = immediate points (negative because we want to maximize) + future potential
+                    const futureScore = this.lookahead(newGrid, 1, 3);
+                    const immediatePoints = move.score;
+                    // Combine: prefer high immediate score and low future remaining cells
+                    const evaluation = futureScore - (immediatePoints * 0.5);
+                    
+                    if (evaluation < bestEvaluation) {
+                        bestEvaluation = evaluation;
+                        bestMove = move;
+                    }
+                }
+                
+                if (bestMove) {
+                    // Highlight the suggested move
+                    bestMove.group.forEach(([r, c]) => {
+                        const cell = this.gameBoard.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                        if (cell) {
+                            cell.classList.add('hint');
+                        }
+                    });
+                    
+                    // Store hint for clearing later
+                    this.currentHint = bestMove;
+                    
+                    // Auto-clear hint after 5 seconds
+                    if (this.hintTimeout) clearTimeout(this.hintTimeout);
+                    this.hintTimeout = setTimeout(() => this.clearHint(), 5000);
+                }
+            }
+
+            clearHint() {
+                document.querySelectorAll('.cell.hint').forEach(cell => {
+                    cell.classList.remove('hint');
+                });
+                this.currentHint = null;
+                if (this.hintTimeout) {
+                    clearTimeout(this.hintTimeout);
+                    this.hintTimeout = null;
+                }
             }
 
             highlightGroup(row, col, highlight) {
