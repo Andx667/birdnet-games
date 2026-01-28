@@ -190,11 +190,13 @@
             font-weight: 700;
             text-align: center;
             padding: 5px;
-            transition: all 0.15s ease-in-out;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             min-width: 0;
             min-height: 0;
-            position: relative;
+            position: absolute;
+            transition: transform 0.15s ease-out, left 0.15s ease-out, top 0.15s ease-out;
+            width: calc((100% - (3 * clamp(8px, 1.5vw, 15px))) / 4);
+            height: calc((100% - (3 * clamp(8px, 1.5vw, 15px))) / 4);
         }
 
         .tile-image {
@@ -206,13 +208,21 @@
         }
 
         .tile-name {
-            font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+            font-size: clamp(0.6rem, 1.8vw, 0.85rem);
             color: white;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6);
             max-width: 100%;
+            word-break: break-word;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: 600;
         }
 
         .tile-level {
@@ -229,26 +239,39 @@
         }
 
         .tile-new {
-            animation: appear 0.2s;
+            animation: appear 0.2s ease-out;
         }
 
         .tile-merged {
-            animation: merge 0.2s;
+            animation: merge 0.3s ease-in-out;
+            z-index: 10;
         }
 
         @keyframes appear {
-            from {
+            0% {
                 transform: scale(0);
+                opacity: 0;
             }
-            to {
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
                 transform: scale(1);
+                opacity: 1;
             }
         }
 
         @keyframes merge {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         .game-message {
@@ -617,6 +640,10 @@
                 this.touchStartY = 0;
                 
                 this.bestElement.textContent = this.bestScore;
+                
+                // Track tile IDs for animations
+                this.nextTileId = 0;
+                this.tileElements = new Map();
             }
 
             async init() {
@@ -681,6 +708,8 @@
                 this.updateScore();
                 this.gameMessage.classList.remove('show');
                 this.tileContainer.innerHTML = '';
+                this.nextTileId = 0;
+                this.tileElements.clear();
                 
                 // Add two starting tiles
                 this.addRandomTile();
@@ -704,7 +733,7 @@
                 const { row, col } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
                 // 90% chance of level 0, 10% chance of level 1
                 const level = Math.random() < 0.9 ? 0 : 1;
-                this.grid[row][col] = { level, isNew: true };
+                this.grid[row][col] = { level, isNew: true, id: this.nextTileId++ };
                 return true;
             }
 
@@ -787,7 +816,7 @@
                     if (i + 1 < tiles.length && tiles[i].level === tiles[i + 1].level) {
                         const newLevel = tiles[i].level + 1;
                         if (newLevel < BIRDS.length) {
-                            result.push({ level: newLevel, isMerged: true });
+                            result.push({ level: newLevel, isMerged: true, id: this.nextTileId++ });
                             this.score += Math.pow(2, newLevel + 1);
                             i += 2;
                         } else {
@@ -849,50 +878,97 @@
                 }
             }
 
+            getTilePosition(row, col) {
+                const gap = parseFloat(getComputedStyle(this.tileContainer.parentElement).gap) || 15;
+                const containerWidth = this.tileContainer.offsetWidth;
+                const tileSize = (containerWidth - (3 * gap)) / 4;
+                return {
+                    left: col * (tileSize + gap),
+                    top: row * (tileSize + gap)
+                };
+            }
+
             render() {
-                this.tileContainer.innerHTML = '';
+                const newTileElements = new Map();
 
                 for (let row = 0; row < this.gridSize; row++) {
                     for (let col = 0; col < this.gridSize; col++) {
                         const tile = this.grid[row][col];
                         if (tile !== null) {
                             const bird = BIRDS[tile.level];
-                            const tileDiv = document.createElement('div');
-                            tileDiv.className = 'tile';
-                            if (tile.isNew) tileDiv.classList.add('tile-new');
-                            if (tile.isMerged) tileDiv.classList.add('tile-merged');
+                            let tileDiv = this.tileElements.get(tile.id);
+                            const position = this.getTilePosition(row, col);
+                            
+                            if (!tileDiv) {
+                                // Create new tile element
+                                tileDiv = document.createElement('div');
+                                tileDiv.className = 'tile';
+                                tileDiv.style.background = bird.color;
+                                tileDiv.style.left = position.left + 'px';
+                                tileDiv.style.top = position.top + 'px';
 
-                            tileDiv.style.gridRow = row + 1;
-                            tileDiv.style.gridColumn = col + 1;
-                            tileDiv.style.background = bird.color;
+                                const levelBadge = document.createElement('div');
+                                levelBadge.className = 'tile-level';
+                                levelBadge.textContent = tile.level + 1;
 
-                            const levelBadge = document.createElement('div');
-                            levelBadge.className = 'tile-level';
-                            levelBadge.textContent = tile.level + 1;
+                                const img = document.createElement('img');
+                                img.className = 'tile-image';
+                                img.src = bird.imageUrl;
+                                img.alt = bird.name;
+                                img.onerror = function() {
+                                    this.classList.add('hidden');
+                                };
 
-                            const img = document.createElement('img');
-                            img.className = 'tile-image';
-                            img.src = bird.imageUrl;
-                            img.alt = bird.name;
-                            img.onerror = function() {
-                                this.classList.add('hidden');
-                            };
+                                const name = document.createElement('div');
+                                name.className = 'tile-name';
+                                name.textContent = bird.name;
 
-                            const name = document.createElement('div');
-                            name.className = 'tile-name';
-                            name.textContent = bird.name.length > 15 ? bird.name.substring(0, 13) + '...' : bird.name;
-
-                            tileDiv.appendChild(levelBadge);
-                            tileDiv.appendChild(img);
-                            tileDiv.appendChild(name);
-                            this.tileContainer.appendChild(tileDiv);
-
+                                tileDiv.appendChild(levelBadge);
+                                tileDiv.appendChild(img);
+                                tileDiv.appendChild(name);
+                                this.tileContainer.appendChild(tileDiv);
+                                
+                                if (tile.isNew) {
+                                    tileDiv.classList.add('tile-new');
+                                }
+                            } else {
+                                // Update existing tile position
+                                tileDiv.style.left = position.left + 'px';
+                                tileDiv.style.top = position.top + 'px';
+                                
+                                // Update content if level changed (merged)
+                                if (tile.isMerged) {
+                                    tileDiv.classList.add('tile-merged');
+                                    tileDiv.style.background = bird.color;
+                                    tileDiv.querySelector('.tile-level').textContent = tile.level + 1;
+                                    tileDiv.querySelector('.tile-image').src = bird.imageUrl;
+                                    tileDiv.querySelector('.tile-image').alt = bird.name;
+                                    tileDiv.querySelector('.tile-name').textContent = bird.name;
+                                    
+                                    // Remove merge animation after it completes
+                                    setTimeout(() => {
+                                        tileDiv.classList.remove('tile-merged');
+                                    }, 300);
+                                }
+                            }
+                            
+                            newTileElements.set(tile.id, tileDiv);
+                            
                             // Clear animation flags
                             tile.isNew = false;
                             tile.isMerged = false;
                         }
                     }
                 }
+
+                // Remove tiles that are no longer on the grid
+                for (const [id, element] of this.tileElements) {
+                    if (!newTileElements.has(id)) {
+                        element.remove();
+                    }
+                }
+
+                this.tileElements = newTileElements;
             }
         }
 
