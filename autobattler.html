@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BirdNet Auto Battler</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .battler-header {
+            background: white;
+            padding: clamp(15px, 2vw, 25px);
+            border-radius: clamp(6px, 1vw, 12px);
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            width: min(420px, 95vw);
+            margin: 0 auto 18px auto;
+        }
+        .battler-main {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: clamp(6px, 1vw, 12px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: clamp(15px, 2vw, 25px);
+            width: min(700px, 98vw);
+            margin: 0 auto 18px auto;
+        }
+        .board, .shop {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .bird-card {
+            border: 2px solid #1976d2;
+            border-radius: 8px;
+            background: #f8f9fa;
+            margin: 0 5px;
+            padding: 10px 8px 8px 8px;
+            min-width: 70px;
+            min-height: 70px;
+            text-align: center;
+            position: relative;
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            box-shadow: 0 2px 4px rgba(25, 118, 210, 0.08);
+            transition: transform 0.15s;
+        }
+        .bird-card:hover { transform: scale(1.04); border-color: #1565c0; }
+        .shop .bird-card { cursor: pointer; border-color: #4caf50; background: #e8f5e9; }
+        .currency, .health { font-size: 1.1em; margin: 5px; color: #1976d2; font-weight: 600; }
+        .arrow { position: absolute; pointer-events: none; z-index: 10; }
+        .arrow svg { overflow: visible; }
+        .action-btn { margin: 10px 0; padding: 10px 22px; font-size: 1em; border-radius: 6px; border: 1px solid #1976d2; background: #1976d2; color: #fff; cursor: pointer; font-weight: 600; box-shadow: 0 2px 4px rgba(25, 118, 210, 0.12); }
+        .action-btn:disabled { background: #ccc; border-color: #ccc; color: #888; cursor: not-allowed; }
+        #message { min-height: 24px; text-align: center; color: #1976d2; font-weight: 500; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="battler-header">
+            <a href="index.html" class="back-link">← Back to Games</a>
+            <h1 style="color:#1976d2; font-size:clamp(1.1rem,3vw,2rem); font-weight:600; letter-spacing:-0.5px;">BirdNet Auto Battler</h1>
+            <div class="game-info-box">
+                <strong>How to Play:</strong> Buy birds in the shop, then battle the AI! Combine 3 of a kind for upgrades. Survive longer than the AI to win.<br>
+                <strong>Birds:</strong> Features real bird species from BirdNET data.
+            </div>
+        </header>
+        <main class="battler-main">
+            <div class="health" id="player-health">Player Health: 30</div>
+            <div class="health" id="ai-health">AI Health: 30</div>
+            <div class="currency" id="currency">Currency: 1</div>
+            <div id="phase-indicator">Shop Phase</div>
+            <div class="shop" id="shop"></div>
+            <button class="action-btn" id="end-shop">End Shop Phase</button>
+            <div style="margin:10px 0 0 0;">
+                <div style="font-weight:600; color:#1976d2;">Your Board</div>
+                <div class="board" id="player-board"></div>
+            </div>
+            <div style="margin:10px 0 0 0;">
+                <div style="font-weight:600; color:#d32f2f;">AI Board</div>
+                <div class="board" id="ai-board"></div>
+            </div>
+            <div id="arrows"></div>
+            <div id="message"></div>
+        </main>
+        <footer>
+            <p>Auto-battle with birds! Inspired by <a href="https://birdnet.cornell.edu" target="_blank">BirdNET</a> • Data: <a href="https://birdnet.cornell.edu/api2/requeststats" target="_blank">BirdNET API</a> • Open source on <a href="https://github.com/Andx667/birdnet-games" target="_blank">GitHub</a></p>
+            <p class="footer-line" id="dataSource">Bird data from BirdNET</p>
+        </footer>
+    </div>
+    <script src="common.js"></script>
+    <script src="autobattler.js"></script>
+</body>
+</html>
